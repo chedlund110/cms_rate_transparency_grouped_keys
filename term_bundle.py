@@ -3,6 +3,8 @@ from decimal import Decimal, ROUND_HALF_UP
 
 class TermBundle:
     def __init__(self, term: Dict[str, Any], parent_code_group_id: Optional[int] = 0, rate_type_desc: Optional[str] = 'professional') -> None:
+        
+        self.rate_sheet_code = term.get("RATESHEETCODE", "")
         self.calc_bean: str = (term.get("CALCBEAN") or "").strip()
         self.fee_schedule_name: str = (term.get("ACTIONPARM1") or "").strip()
 

@@ -4,7 +4,7 @@ from constants import section_mapping
 from shared_config import SharedConfig
 from typing import Any
 
-def load_ratesheet(context: Context, query: str) -> dict[str, list[dict[str, Any]]]:
+def load_ratesheet(context: Context, query: str, rate_sheet_code: str = None) -> dict[str, list[dict[str, Any]]]:
     rate_sheet = {
         "preprocessing": [],
         "inpatient exclusions": [],
@@ -23,6 +23,10 @@ def load_ratesheet(context: Context, query: str) -> dict[str, list[dict[str, Any
     rate_sheet_terms = context.networx_conn.execute_query_with_columns(query)
 
     for term in rate_sheet_terms:
+
+        if rate_sheet_code is not None:
+            term["RATESHEETCODE"] = rate_sheet_code
+
         section_number = term.get("DISPLAYSECTIONNUMBER")
         if section_number is None:
             continue
@@ -56,7 +60,7 @@ def load_ratesheet_by_code(context: Context, rate_sheet_code: str) -> dict[str, 
     WHERE SRS.RATESHEETCODE = '{rate_sheet_code}'
       AND GETDATE() BETWEEN SRST.FROMDATE AND SRST.TODATE
     """
-    return load_ratesheet(context, query)
+    return load_ratesheet(context, query, rate_sheet_code)
 
 def load_ratesheet_by_id(context: Context, rate_sheet_id: int) -> dict[str, list[dict[str, Any]]]:
     query = f"""
@@ -81,6 +85,8 @@ def load_subterms(context: Context, rate_sheet_id: str, term: dict) -> list[dict
     if rate_sheet_id in context.subratesheet_cache:
         return context.subratesheet_cache[rate_sheet_id]
 
+    rate_sheet_code: str = term.get("RATESHEETCODE", "")
+
     query = f"""
     SELECT 
         SRST.CALCBEAN, SRST.ACTIONPARM1, SRST.BASEPERCENTOFCHGS, SRST.CODEGROUPID,
@@ -101,6 +107,8 @@ def load_subterms(context: Context, rate_sheet_id: str, term: dict) -> list[dict
     parent_seq_number = int(term.get("SEQNUMBER") or 0)
 
     for subterm in rate_sheet_terms:
+        if rate_sheet_code:
+            subterm["RATESHEETCODE"] = rate_sheet_code
         subterm["PARENTSECTIONNUMBER"] = parent_section_number
         subterm["PARENTSEQNUMBER"] = parent_seq_number
         subterms.append(subterm)

@@ -7,15 +7,13 @@ from file_writer import write_provider_identifiers_record
 from utilities import get_service_code_type, update_prov_grp_contract_keys
 
 
-def process_case_rate(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_case_rate(context: Context, term_bundle: TermBundle) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
 
-    rate_key = f"{provider_bundle.provid}#{provider_bundle.rate_sheet_code}#case_rate"
-    write_provider_identifiers_record(context, provider_bundle, rate_key)
-    update_prov_grp_contract_keys(provider_bundle, rate_key)
+    rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
 
     # Static values from term
     calc_bean = term_bundle.calc_bean
@@ -55,19 +53,17 @@ def process_case_rate(context: Context, provider_bundle: ProviderBundle, term_bu
                     "calc_bean": calc_bean
                 }
 
-        dict_key = (provider_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(provider_bundle, dict_key, rate_dict)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
 
             
-def process_case_rate_limit(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_case_rate_limit(context: Context, term_bundle: TermBundle) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
 
-    rate_key = f"{provider_bundle.provid}#{provider_bundle.rate_sheet_code}#case_rate"
-    write_provider_identifiers_record(context, provider_bundle, rate_key)
-    update_prov_grp_contract_keys(provider_bundle, rate_key)
+    rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
 
     # Static values from term
     calc_bean = term_bundle.calc_bean
@@ -107,18 +103,16 @@ def process_case_rate_limit(context: Context, provider_bundle: ProviderBundle, t
                     "calc_bean": calc_bean
                 }
 
-        dict_key = (provider_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(provider_bundle, dict_key, rate_dict)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
 
-def process_cr_ltd_by_pct_of_chg(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
 
-    rate_key = f"{provider_bundle.provid}#{provider_bundle.rate_sheet_code}#case_rate"
-    write_provider_identifiers_record(context, provider_bundle, rate_key)
-    update_prov_grp_contract_keys(provider_bundle, rate_key)
+    rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
 
     # Static values from term
     calc_bean = term_bundle.calc_bean
@@ -154,17 +148,15 @@ def process_cr_ltd_by_pct_of_chg(context: Context, provider_bundle: ProviderBund
                     "calc_bean": calc_bean
                 }
 
-        dict_key = (provider_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(provider_bundle, dict_key, rate_dict)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
 
-def process_case_rate_two_lev_per_diem_limit(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: TermBundle) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
 
-    rate_key = f"{provider_bundle.provid}#{provider_bundle.rate_sheet_code}#case_rate"
-    write_provider_identifiers_record(context, provider_bundle, rate_key)
-    update_prov_grp_contract_keys(provider_bundle, rate_key)
+    rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
 
     # Static values from term
     calc_bean = term_bundle.calc_bean
@@ -205,17 +197,15 @@ def process_case_rate_two_lev_per_diem_limit(context: Context, provider_bundle: 
                     "calc_bean": calc_bean
                 }
 
-        dict_key = (provider_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(provider_bundle, dict_key, rate_dict)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
 
-def process_case_rate_three_lev_per_diem_limit(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: TermBundle) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
 
-    rate_key = f"{provider_bundle.provid}#{provider_bundle.rate_sheet_code}#case_rate"
-    write_provider_identifiers_record(context, provider_bundle, rate_key)
-    update_prov_grp_contract_keys(provider_bundle, rate_key)
+    rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
 
     # Static values from term
     calc_bean = term_bundle.calc_bean
@@ -256,5 +246,5 @@ def process_case_rate_three_lev_per_diem_limit(context: Context, provider_bundle
                     "calc_bean": calc_bean
                 }
 
-        dict_key = (provider_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(provider_bundle, dict_key, rate_dict)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)

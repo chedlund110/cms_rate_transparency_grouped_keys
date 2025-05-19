@@ -11,7 +11,7 @@ from utilities import get_dict_value
 from utilities import get_pos_and_type
 import time
 
-def process_term(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_term(context: Context, term_bundle: TermBundle) -> None:
     # terms with subterms won't have a calculation method - skip them
     # the subterms will have the calculations
     calc_bean: str = term_bundle.calc_bean
@@ -29,24 +29,17 @@ def process_term(context: Context, provider_bundle: ProviderBundle, term_bundle:
         term_bundle.service_mod_pos_list = service_combinations["combinations"]
         term_bundle.has_services = service_combinations["has_services"]
 
-    # check provider-level exclusions
-    if term_bundle.code_group_tree is not None:
-        provider_ranges = get_dict_value(term_bundle.code_group_tree, "provider_ranges", default={}, strip=False, value_type=dict)
-        process_term: bool = check_provider_level_exclusions(context, provider_bundle, provider_ranges)
-        if not process_term:
-            return
-
     # fee schedule name - load the values - will be used in the calculation routines
     # action_parm1 contains the fee_schedule name
     # in most cases, fee schedules are only used for Outpatient
     fee_schedule_name: str = term_bundle.fee_schedule_name
     if fee_schedule_name:
         if fee_schedule_name not in context.fee_schedules:
-            load_fee_schedule(context, provider_bundle, fee_schedule_name)
+            load_fee_schedule(context, fee_schedule_name)
     
     # see the calculation_router module
     # each calculation type is in there
     # along with calc function to call
     calc_handler = CALCULATION_ROUTER.get(calc_bean)
     if calc_handler:
-        calc_handler(context, provider_bundle, term_bundle)
+        calc_handler(context, term_bundle)

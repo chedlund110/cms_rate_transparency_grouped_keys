@@ -54,5 +54,6 @@ class BufferedRateFileWriter:
 
     def _create_mms_file(self):
         mms_filename = self.current_file_path.rsplit(".", 1)[0] + ".MMS"
+        os.makedirs(os.path.dirname(mms_filename), exist_ok=True)  # ✅ Ensure the directory exists
         with open(mms_filename, "w", encoding="utf-8") as f:
             f.write("Number of Records:" + str(self.records_processed))

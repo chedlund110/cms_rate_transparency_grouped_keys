@@ -1,24 +1,14 @@
 from constants import DEFAULT_EXP_DATE
 
-def store_rate_record(provider_bundle, dict_key, rate_dict, update_proc_xref: bool = True) -> None:
-    
-    provider_bundle.provider_rates_temp[dict_key] = rate_dict
-
-    # Flush if batch is large
-    if len(provider_bundle.rate_write_batch) >= 500:
-        provider_bundle.rate_file_writer.write_batch(provider_bundle.rate_write_batch)
-        provider_bundle.rate_write_batch.clear()
-
-    # ✅ Optional fallback cache update
-    if update_proc_xref:
-        proc_code = rate_dict.get("billing_code", "")
-        if proc_code and proc_code not in provider_bundle.proc_code_amount_xref:
-            provider_bundle.proc_code_amount_xref[proc_code] = {
-                "rate": float(rate_dict.get("rate", 0)),
-                "percentage": float(rate_dict.get("percentage", 0)),
-                "billing_code_type": rate_dict.get("billing_code_type", ""),
-                "expiration_date": rate_dict.get("expiration_date", DEFAULT_EXP_DATE),
-            }
+def store_rate_record(
+    ratesheet_temp: dict,
+    dict_key: tuple,
+    rate_dict: dict
+) -> None:
+    """
+    Stores a rate record for a single rate sheet using a temporary dict.
+    """
+    ratesheet_temp[dict_key] = rate_dict
 
 def build_partial_indexes(provider_rates_temp: dict) -> dict[str, dict]:
     """

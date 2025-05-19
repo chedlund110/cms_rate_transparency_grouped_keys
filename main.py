@@ -20,11 +20,11 @@ from datetime import datetime
 import json
 from merge_output_files import merge_all_outputs
 import os
-from parallel_runner import parallel_process_providers
+from ratesheet_runner import process_ratesheets
+from parallel_ratesheet_runner import parallel_process_ratesheets
 from place_of_service_extract import PlaceOfServiceExtract
 from plan_detail_extract import PlanDetailExtract
 from profiler import Profiler
-from provider_runner import process_providers
 import pstats
 from setup_environment import ensure_directories_exist
 from shared_config import SharedConfig
@@ -155,12 +155,12 @@ def main():
     """
 
     # Stand-alone extracts
-    process_billing_codes(context, base_params)
-    process_place_of_service_codes(context, base_params)
-    process_plan_details(context, base_params)
+    #process_billing_codes(context, base_params)
+    #process_place_of_service_codes(context, base_params)
+    #process_plan_details(context, base_params)
     
-    #process_providers(shared_config, networx_conn, qnxt_conn)
-    parallel_process_providers(shared_config)
+    process_ratesheets(shared_config, networx_conn, qnxt_conn)
+    # parallel_process_ratesheets(shared_config)
 
     merge_all_outputs(shared_config)
     

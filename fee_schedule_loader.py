@@ -44,7 +44,7 @@ def fetch_default_fee_schedule(context: Context, schedule_name: str) -> list[dic
     return context.networx_conn.execute_query_with_columns(query)
 
 # --- Shared row parser ---
-def process_fee_schedule_rows(context: Context, provider_bundle: ProviderBundle, fee_schedule_name: str, rows: list[dict[str, Any]]) -> dict:
+def process_fee_schedule_rows(context: Context, fee_schedule_name: str, rows: list[dict[str, Any]]) -> dict:
     fee_schedule = {}
     for row in rows:
         proc_code = row.get("PROCEDURECODE", "")
@@ -70,25 +70,20 @@ def process_fee_schedule_rows(context: Context, provider_bundle: ProviderBundle,
 
         fee_schedule[modifier][proc_code] = temp_dict
 
-        if proc_code not in provider_bundle.procedure_fee_schedule_xref:
-            provider_bundle.procedure_fee_schedule_xref[proc_code] = {}
-        provider_bundle.procedure_fee_schedule_xref[proc_code][fee_schedule_name] = {}
-
     return fee_schedule
 
 # --- Main entry point ---
-def load_fee_schedule(context: Context, provider_bundle: ProviderBundle, schedule_name: str) -> None:
+def load_fee_schedule(context: Context, schedule_name: str) -> None:
     
     if schedule_name in context.fee_schedules:
         return
 
-    provider_zip = (provider_bundle.zip or "").strip()[:5]
     metadata = fetch_schedule_metadata(context, schedule_name)
     schedule_type = metadata.get("SCHEDULETYPE", "")
     zip_source_type = metadata.get("ZIPSOURCETYPE", "")
 
     if schedule_type == "CarrierLocFeeSched":
-        locality_info = fetch_locality_info(context, provider_zip, zip_source_type)
+        locality_info = fetch_locality_info(context, '00000', zip_source_type)
         if locality_info:
             rows = fetch_locality_fee_schedule(
                 context,
@@ -96,9 +91,9 @@ def load_fee_schedule(context: Context, provider_bundle: ProviderBundle, schedul
                 locality_info["LOCALITYNUMBER"],
                 locality_info["CARRIERNUMBER"]
             )
-            context.fee_schedules[schedule_name] = process_fee_schedule_rows(context, provider_bundle, schedule_name, rows)
+            context.fee_schedules[schedule_name] = process_fee_schedule_rows(context, schedule_name, rows)
         else:
             context.fee_schedules[schedule_name] = {}
     else:
         rows = fetch_default_fee_schedule(context, schedule_name)
-        context.fee_schedules[schedule_name] = process_fee_schedule_rows(context, provider_bundle, schedule_name, rows)
+        context.fee_schedules[schedule_name] = process_fee_schedule_rows(context, schedule_name, rows)

@@ -1,24 +1,17 @@
 from constants import GROUPER_COLUMN_MAP, rate_template
 from context import Context
-from file_writer import write_provider_identifiers_record
-from provider_bundle import ProviderBundle
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
-from utilities import update_prov_grp_contract_keys
 
-def calc_asc_grouper_9lv_no_disc(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle):
-    prov_id = provider_bundle.provid
-    rate_sheet_code = provider_bundle.rate_sheet_code
+def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle):
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
+    rate_sheet_code = term_bundle.rate_sheet_code
     base_pct_of_charge = term_bundle.base_pct_of_charge
 
-    rate_key = f"{prov_id}#{rate_sheet_code}#grouper"
-    write_provider_identifiers_record(context, provider_bundle, rate_key)
-    update_prov_grp_contract_keys(provider_bundle, rate_key)
-
+    rate_key = f"{rate_sheet_code}#grouper"
     modifier = ''
     pos = '21'
     proc_code_type = "CPT"
@@ -55,21 +48,17 @@ def calc_asc_grouper_9lv_no_disc(context: Context, provider_bundle: ProviderBund
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(provider_bundle, dict_key, rate_dict)
+        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
 
-def calc_asc_grouper_base(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle):
-    prov_id = provider_bundle.provid
-    rate_sheet_code = provider_bundle.rate_sheet_code
+def calc_asc_grouper_base(context: Context, term_bundle: TermBundle):
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
+    rate_sheet_code = term_bundle.rate_sheet_code
     base_pct_of_charge = term_bundle.base_pct_of_charge
 
-    rate_key = f"{prov_id}#{rate_sheet_code}#grouper"
-    write_provider_identifiers_record(context, provider_bundle, rate_key)
-    update_prov_grp_contract_keys(provider_bundle, rate_key)
-
+    rate_key = f"{rate_sheet_code}#grouper"
     modifier = ''
     pos = '21'
     proc_code_type = "CPT"
@@ -101,4 +90,4 @@ def calc_asc_grouper_base(context: Context, provider_bundle: ProviderBundle, ter
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(provider_bundle, dict_key, rate_dict)
+        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)

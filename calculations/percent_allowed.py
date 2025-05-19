@@ -6,40 +6,37 @@ from term_bundle import TermBundle
 from utilities import get_pos_and_type
 from decimal import Decimal, ROUND_HALF_UP
 
-def process_percent_of_allowed(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed(context: Context, term_bundle: TermBundle) -> None:
     if term_bundle.service_mod_pos_list:
-        process_percent_of_allowed_ranges(context, provider_bundle, term_bundle)
+        process_percent_of_allowed_ranges(context, term_bundle)
     else:
-        process_percent_of_allowed_full(context, provider_bundle, term_bundle)
+        process_percent_of_allowed_full(context, term_bundle)
 
-def process_percent_of_allowed_plus_fd_amt(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed_plus_fd_amt(context: Context, term_bundle: TermBundle) -> None:
     if term_bundle.service_mod_pos_list:
-        process_percent_of_allowed_ranges(context, provider_bundle, term_bundle)
+        process_percent_of_allowed_ranges(context, term_bundle)
     else:
-        process_percent_of_allowed_full(context, provider_bundle, term_bundle)
+        process_percent_of_allowed_full(context, term_bundle)
 
-def process_percent_of_allowed_ranges(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle) -> None:
     base_pct = term_bundle.base_pct_of_charge
     section_id = term_bundle.section_id
     rate_pos, rate_type_desc = get_pos_and_type(section_name='')
     calc_bean = term_bundle.calc_bean
     fee_schedule_name = term_bundle.fee_schedule_name
 
-    # Build grouping key
-    rate_key = f"{provider_bundle.provid}#{provider_bundle.rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{term_bundle.rate_sheet_code}#{fee_schedule_name}"
 
     for proc_code, modifier, pos in term_bundle.service_mod_pos_list:
         full_key = (fee_schedule_name, proc_code, modifier, pos)
 
-        if full_key in provider_bundle.provider_rates_temp:
-            base_entry = provider_bundle.provider_rates_temp[full_key]
+        if full_key in context.rate_sheet_rate_cache:
+            base_entry = context.rate_sheet_rate_cache[full_key]
         else:
-            # Fallback: look up amount from proc_code-only cache
-            base_entry = provider_bundle.proc_code_amount_xref.get(proc_code)
+            base_entry = context.proc_code_amount_xref.get(proc_code)
             if not base_entry:
-                continue  # No fallback available
+                continue
 
-            # Seed a minimal entry under the full key
             new_entry = {
                 "rate": base_entry.get("rate"),
                 "percentage": base_entry.get("percentage"),
@@ -50,8 +47,7 @@ def process_percent_of_allowed_ranges(context: Context, provider_bundle: Provide
                 "expiration_date": base_entry.get("expiration_date", DEFAULT_EXP_DATE),
                 "rate_key": rate_key,
             }
-
-            provider_bundle.provider_rates_temp[full_key] = new_entry
+            context.rate_sheet_rate_cache[full_key] = new_entry
             base_entry = new_entry
 
         allow_amt = round(float(base_entry.get("rate", 0)), 2)
@@ -89,11 +85,11 @@ def process_percent_of_allowed_ranges(context: Context, provider_bundle: Provide
             "calc_bean": calc_bean
         })
 
-        store_rate_record(provider_bundle, full_key, rate_dict, False)
+        store_rate_record(context.rate_sheet_rate_cache, full_key, rate_dict)
 
-def process_percent_of_allowed_full(context: Context, provider_bundle: ProviderBundle, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed_full(context: Context, term_bundle: TermBundle) -> None:
     base_pct = term_bundle.base_pct_of_charge
-    for (_, _, _, _), proc_details in provider_bundle.provider_rates_temp.items():
+    for full_key, proc_details in context.rate_sheet_rate_cache.items():
         raw_rate = proc_details.get("rate", 0)
-        rate = float(str(raw_rate)) if raw_rate else float("0")
-        proc_details["rate"] = (rate * base_pct)
+        rate = float(str(raw_rate)) if raw_rate else 0.0
+        proc_details["rate"] = rate * base_pct
