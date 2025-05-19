@@ -1,0 +1,83 @@
+{
+    "reporting_entity": "SENTARA HEALTH PLANS",
+    "reporting_entity_type": "HEALTH INSURANCE ISSUER",
+    "insurer_code": "SENTARA",
+    "networx_database": {
+        "server": "he1tecfqnxtdb21",
+        "driver": "{ODBC Driver 17 for SQL Server}",
+        "database": "networx",
+        "port": 1433,
+        "trusted_connection": true
+    },
+    "qnxt_database": {
+        "server": "he1teu2qnxtdb01",
+        "driver": "{ODBC Driver 17 for SQL Server}",
+        "port": 1433,
+        "database": "PlanData",
+        "trusted_connection": true
+    },
+    "app_base_directory": "Z:\\Avmed MRF\\",
+    "directory_structure": {
+        "mrf_output_dir": "mrf_output",
+        "status_tracker_dir": "status_tracker",
+        "temp_output_dir": "temp_output",
+        "log_dir": "logs",
+        "test_output_dir": "test_scripts"
+    },
+    "mrf_file_prefixes": {
+        "billing_code": "5397-_-6511E119182-_-AVMED_BILLING_CODES_",
+        "billing_code_ext": "TXT",
+        "negotiated_rate": "5397-_-6511E119181-_-AVMED_INNETWORK_NEGOTIATED_RATE_",
+        "negotiated_rate_ext": "TXT",
+        "prov_grp_contract": "5397-_-6511E119180-_-AVMED_PLAN_COLLECTN_PROVIDERGRPCNTRCT_",
+        "prov_grp_contract_ext": "TXT",
+        "plan_detail": "5397-_-6511E119185-_-AVMED_PLAN_DETAILS_",
+        "plan_detail_ext": "TXT",
+        "place_of_service": "5397-_-6511E119183-_-AVMED_POS_MAPPING_",
+        "place_of_service_ext": "TXT",
+        "provider_identifier": "5397-_-6511E119179-_-AVMED_PROVIDER_IDENTIFIERS_",
+        "provider_identifier_ext": "TXT"
+    },
+    "programs": [
+        "PGMC0000000502",
+        "PGMC0000000503",
+        "PGMC0000000504",
+        "PGMC0000000505",
+        "PGMC0000000506",
+        "PGMP0000000004",
+        "PGMC0000000510",
+        "PGMC0000000507",
+        "PGMP0000000005",
+        "PGMC0000000509",
+        "PGMP0000000007",
+        "PGMP0000000008",
+        "PGMP0000000009",
+        "PGMP0000000010",
+        "PGMP0000000020",
+        "PGMC0000000512"
+    ],
+    "provider_code_range_types": [
+        "CodeTypeServiceProviderTaxID",
+        "CodeTypeProviderNPI",
+        "CodeTypeProviderID",
+        "CodeTypeProviderType",
+        "CodeTypeProviderTaxonomyCode",
+        "CodeTypePlanID",
+        "CodeTypeSpecialty",
+        "CodeTypeProviderZip"
+    ],
+    "service_code_range_types": [
+        "CodeTypeNDCCodeLine",
+        "CodeTypeCPT4Procedure",
+        "CodeTypeRevenue",
+        "CodeTypeDRG",
+        "CodeTypeHCPC",
+        "CodeTypeProcedureWithModifier",
+        "CodeTypeCPT4",
+        "CodeTypeCPT4CodeExists"
+    ],
+    "service_companion_code_types": [
+        "CodeTypeCPTMod",
+        "CodeTypePlaceOfService"
+    ]
+}
