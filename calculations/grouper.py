@@ -3,7 +3,7 @@ from context import Context
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 
-def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle):
+def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle, rate_cache: dict):
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -48,9 +48,9 @@ def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle):
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def calc_asc_grouper_base(context: Context, term_bundle: TermBundle):
+def calc_asc_grouper_base(context: Context, term_bundle: TermBundle, rate_cache: dict):
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -90,4 +90,4 @@ def calc_asc_grouper_base(context: Context, term_bundle: TermBundle):
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)

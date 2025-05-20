@@ -6,19 +6,20 @@ from term_bundle import TermBundle
 from utilities import get_pos_and_type
 from decimal import Decimal, ROUND_HALF_UP
 
-def process_percent_of_allowed(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     if term_bundle.service_mod_pos_list:
-        process_percent_of_allowed_ranges(context, term_bundle)
+        process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {})
     else:
-        process_percent_of_allowed_full(context, term_bundle)
+        process_percent_of_allowed_full(context, term_bundle, rate_cache)
 
-def process_percent_of_allowed_plus_fd_amt(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed_plus_fd_amt(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     if term_bundle.service_mod_pos_list:
-        process_percent_of_allowed_ranges(context, term_bundle)
+        process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {})
     else:
-        process_percent_of_allowed_full(context, term_bundle)
+        process_percent_of_allowed_full(context, term_bundle, rate_cache)
 
-def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle, rate_cache: dict,
+                                      proc_code_amount_xref) -> None:
     base_pct = term_bundle.base_pct_of_charge
     section_id = term_bundle.section_id
     rate_pos, rate_type_desc = get_pos_and_type(section_name='')
@@ -30,10 +31,10 @@ def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle)
     for proc_code, modifier, pos in term_bundle.service_mod_pos_list:
         full_key = (fee_schedule_name, proc_code, modifier, pos)
 
-        if full_key in context.rate_sheet_rate_cache:
-            base_entry = context.rate_sheet_rate_cache[full_key]
+        if full_key in rate_cache:
+            base_entry = rate_cache[full_key]
         else:
-            base_entry = context.proc_code_amount_xref.get(proc_code)
+            base_entry = proc_code_amount_xref.get(proc_code)
             if not base_entry:
                 continue
 
@@ -47,7 +48,7 @@ def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle)
                 "expiration_date": base_entry.get("expiration_date", DEFAULT_EXP_DATE),
                 "rate_key": rate_key,
             }
-            context.rate_sheet_rate_cache[full_key] = new_entry
+            rate_cache[full_key] = new_entry
             base_entry = new_entry
 
         allow_amt = round(float(base_entry.get("rate", 0)), 2)
@@ -85,11 +86,11 @@ def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle)
             "calc_bean": calc_bean
         })
 
-        store_rate_record(context.rate_sheet_rate_cache, full_key, rate_dict)
+        store_rate_record(rate_cache, full_key, rate_dict)
 
-def process_percent_of_allowed_full(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_of_allowed_full(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     base_pct = term_bundle.base_pct_of_charge
-    for full_key, proc_details in context.rate_sheet_rate_cache.items():
+    for full_key, proc_details in rate_cache.items():
         raw_rate = proc_details.get("rate", 0)
         rate = float(str(raw_rate)) if raw_rate else 0.0
         proc_details["rate"] = rate * base_pct

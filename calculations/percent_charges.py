@@ -6,7 +6,7 @@ from term_bundle import TermBundle
 from file_writer import write_provider_identifiers_record
 from utilities import get_fee_and_type, get_service_code_type, update_prov_grp_contract_keys
 
-def process_percent_of_charges(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     if not term_bundle.base_pct_of_charge:
         return
 
@@ -59,9 +59,9 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle) -> Non
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle) -> None:
+def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -112,9 +112,9 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle) -> N
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_percent_of_charges_max(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -161,9 +161,9 @@ def process_percent_of_charges_max(context: Context, term_bundle: TermBundle) ->
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -210,9 +210,9 @@ def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle)
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle) -> None:
+def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -259,9 +259,9 @@ def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle) -> None:
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle) -> None:
+def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -308,10 +308,10 @@ def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle) -> None
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
 
-def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle) -> None:
+def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -358,9 +358,9 @@ def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle) -> N
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle) -> None:
+def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -407,9 +407,9 @@ def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_percent_threshold(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     rate_sheet_code = term_bundle.rate_sheet_code
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
@@ -456,4 +456,4 @@ def process_percent_threshold(context: Context, term_bundle: TermBundle) -> None
         })
 
         dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)

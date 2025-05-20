@@ -7,7 +7,7 @@ from file_writer import write_provider_identifiers_record
 from utilities import get_service_code_type, update_prov_grp_contract_keys
 
 
-def process_case_rate(context: Context, term_bundle: TermBundle) -> None:
+def process_case_rate(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
@@ -54,10 +54,10 @@ def process_case_rate(context: Context, term_bundle: TermBundle) -> None:
                 }
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
             
-def process_case_rate_limit(context: Context, term_bundle: TermBundle) -> None:
+def process_case_rate_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
@@ -104,9 +104,9 @@ def process_case_rate_limit(context: Context, term_bundle: TermBundle) -> None:
                 }
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle) -> None:
+def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
@@ -149,9 +149,9 @@ def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle) -> N
                 }
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: TermBundle) -> None:
+def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -198,9 +198,9 @@ def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: Term
                 }
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: TermBundle) -> None:
+def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -247,4 +247,4 @@ def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: Te
                 }
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)

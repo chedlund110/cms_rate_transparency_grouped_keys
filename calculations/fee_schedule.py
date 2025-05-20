@@ -4,13 +4,13 @@ from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_pos_and_type
 
-def process_fee_schedule(context: Context, term_bundle: TermBundle) -> None:
+def process_fee_schedule(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     if term_bundle.service_mod_pos_list:
-        process_fee_schedule_ranges(context, term_bundle)
+        process_fee_schedule_ranges(context, term_bundle, rate_cache)
     else:
-        process_fee_schedule_full(context, term_bundle)
+        process_fee_schedule_full(context, term_bundle, rate_cache)
 
-def process_fee_schedule_full(context: Context, term_bundle: TermBundle) -> None:
+def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     calc_bean = term_bundle.calc_bean
@@ -55,9 +55,9 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle) -> None
                 "full_term_section_id": section_id,
                 "calc_bean": calc_bean
             }
-            store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+            store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle) -> None:
+def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     calc_bean = term_bundle.calc_bean
@@ -110,4 +110,4 @@ def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle) -> No
             "full_term_section_id": section_id,
             "calc_bean": calc_bean
         }
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)

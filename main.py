@@ -159,8 +159,8 @@ def main():
     #process_place_of_service_codes(context, base_params)
     #process_plan_details(context, base_params)
     
-    process_ratesheets(shared_config, networx_conn, qnxt_conn)
-    # parallel_process_ratesheets(shared_config)
+    #process_ratesheets(shared_config, networx_conn, qnxt_conn)
+    parallel_process_ratesheets(shared_config)
 
     merge_all_outputs(shared_config)
     

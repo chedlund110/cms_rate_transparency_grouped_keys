@@ -4,7 +4,7 @@ from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_service_code_type
 
-def process_per_item(context: Context, term_bundle: TermBundle) -> None:
+def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -49,9 +49,9 @@ def process_per_item(context: Context, term_bundle: TermBundle) -> None:
         })
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle) -> None:
+def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -92,9 +92,9 @@ def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle) -> None:
         })
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_percent_plus_excess(context: Context, term_bundle: TermBundle) -> None:
+def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -135,9 +135,9 @@ def process_percent_plus_excess(context: Context, term_bundle: TermBundle) -> No
         })
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle) -> None:
+def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -178,9 +178,9 @@ def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle) 
         })
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_flat_dollar_discount(context: Context, term_bundle: TermBundle) -> None:
+def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -220,9 +220,9 @@ def process_flat_dollar_discount(context: Context, term_bundle: TermBundle) -> N
         })
 
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)
 
-def process_ndc(context: Context, term_bundle: TermBundle):
+def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict):
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -265,4 +265,4 @@ def process_ndc(context: Context, term_bundle: TermBundle):
         })
 
         dict_key = (term_bundle.rate_sheet_code, ndc_code, modifier, pos)
-        store_rate_record(context.rate_sheet_rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict)

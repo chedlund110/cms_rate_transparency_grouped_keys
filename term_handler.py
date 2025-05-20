@@ -11,7 +11,7 @@ from utilities import get_dict_value
 from utilities import get_pos_and_type
 import time
 
-def process_term(context: Context, term_bundle: TermBundle) -> None:
+def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
     # terms with subterms won't have a calculation method - skip them
     # the subterms will have the calculations
     calc_bean: str = term_bundle.calc_bean
@@ -42,4 +42,12 @@ def process_term(context: Context, term_bundle: TermBundle) -> None:
     # along with calc function to call
     calc_handler = CALCULATION_ROUTER.get(calc_bean)
     if calc_handler:
-        calc_handler(context, term_bundle)
+        calc_handler(context, term_bundle, rate_cache)
+
+def derive_grouping_keys_for_term(
+    rate_sheet_code: str,
+    service_codes: set[str],
+    provider_qualifiers: dict,
+    existing_keys: set[str]
+) -> dict[str, set[str]]:
+    pass
