@@ -20,7 +20,7 @@ def process_ratesheet_worker(
     qnxt_conn: Any,
     tracker: Any,
     rate_file_writer: Any
-) -> None:
+) -> RateGroupKeyFactory:
     
     rate_group_key_factory: RateGroupKeyFactory = RateGroupKeyFactory()
 
@@ -34,8 +34,6 @@ def process_ratesheet_worker(
 
         rate_cache: dict = {}
 
-        #try:
-            # Load sections + terms for this rate sheet
         ratesheet = load_ratesheet_by_code(context, rate_sheet_code)
 
         process_inpatient_per_diem(context, ratesheet.get("inpatient per diem", []), rate_cache, rate_group_key_factory)
@@ -50,9 +48,6 @@ def process_ratesheet_worker(
 
         rate_file_writer.flush_cache(rate_cache)
         rate_cache.clear()
+        
+    return(rate_group_key_factory)
 
-        # Mark this rate sheet as complete
-        #tracker.mark_complete(ratesheet_id)
-
-        #except Exception as e:
-        #   print(f"❌ Error processing rate sheet {rate_sheet_code}: {e}")

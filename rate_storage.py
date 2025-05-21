@@ -8,23 +8,26 @@ def store_rate_record(
     rate_dict: dict,
     group_key: str = None,
     key_factory: RateGroupKeyFactory = None,
-    code_tuple: tuple[str,str,str] = None,
+    code_tuple: tuple[str, str, str] = None,
 ) -> None:
     """
     Stores a rate record for a single rate sheet using a temporary dict.
+    Also updates the group key with the procedure code used.
     """
     rate_cache[dict_key] = rate_dict
 
     if group_key and key_factory and code_tuple:
         proc_code, modifier, pos = code_tuple
-        key = key_factory.get(group_key)
+        rate_sheet_code = group_key.split("#")[0]
+
+        key = key_factory.get_keys_for_rate_sheet(rate_sheet_code).get(group_key)
 
         if not key:
             # This should only happen if somehow the factory missed this key earlier
             key = RateGroupKey(key=group_key, codes=set(), qualifiers=None)
-            key_factory.store[group_key] = key
+            key_factory.store[rate_sheet_code][group_key] = key  # <-- nested insert
 
-    key.add_code(proc_code, modifier, pos)
+        key.add_code(proc_code, modifier, pos)
 
 def build_partial_indexes(provider_rates_temp: dict) -> dict[str, dict]:
     """

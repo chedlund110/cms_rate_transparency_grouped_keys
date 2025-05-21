@@ -2,15 +2,16 @@ import multiprocessing
 import os
 import uuid
 from typing import Any, Iterator
+from collections import defaultdict
 from context_factory import build_context
 from shared_config import SharedConfig
 from database_connection import DatabaseConnection
 from file_batch_tracker import FileBatchTracker
 from buffered_rate_file_writer import BufferedRateFileWriter
-from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id  # <-- You'll define this module
-from rate_group_key_factory import RateGroupKeyFactory
+from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id
+from rate_group_key_factory import RateGroupKeyFactory, merge_rate_group_key_factories
 
-def parallel_process_ratesheets(shared_config: SharedConfig) -> None:
+def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFactory:
     tracker_path = os.path.join(shared_config.directory_structure["status_tracker_dir"], "ratesheet_status.json")
     tracker = FileBatchTracker(tracker_path)
 
@@ -25,9 +26,9 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> None:
     ratesheet_rows = fetch_ratesheets(context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)
 
-    #LIMIT = 100  # Optional for testing
-    #grouped_values = list(grouped_ratesheets.values())[:LIMIT]
-    grouped_values = list(grouped_ratesheets.values())
+    LIMIT = 100  # Optional for testing
+    grouped_values = list(grouped_ratesheets.values())[:LIMIT]
+    #grouped_values = list(grouped_ratesheets.values())
     batches = chunk_ratesheet_groups(grouped_values, batch_size=15)
 
     args_list = [
@@ -45,8 +46,11 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> None:
     num_processes = min(8, os.cpu_count() or 1)
 
     with ctx.Pool(processes=num_processes) as pool:
-        pool.starmap(process_ratesheet_batch_safe, args_list)
+        rate_group_key_factories = pool.starmap(process_ratesheet_batch_safe, args_list)
 
+    # Merge all per-worker dicts into a single dict
+    merged_keys = merge_rate_group_key_factories(rate_group_key_factories)
+    return merged_keys
 
 def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_str, qnxt_conn_str, tracker_path):
     from ratesheet_worker import process_ratesheet_worker
@@ -80,7 +84,7 @@ def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_st
     context.rate_file_writer = rate_file_writer
 
     try:
-        process_ratesheet_worker(
+        rate_group_key_factory = process_ratesheet_worker(
             ratesheet_batch,
             context,
             shared_config,
@@ -89,6 +93,8 @@ def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_st
             tracker,
             rate_file_writer
         )
+        return rate_group_key_factory
+    
     except Exception as e:
         print(f"❌ Error in batch {batch_uid}: {e}")
     finally:
@@ -100,3 +106,4 @@ def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_st
 def chunk_ratesheet_groups(grouped_ratesheet_values: list[list[dict]], batch_size: int) -> Iterator[list[list[dict]]]:
     for i in range(0, len(grouped_ratesheet_values), batch_size):
         yield grouped_ratesheet_values[i:i + batch_size]
+

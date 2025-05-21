@@ -25,7 +25,9 @@ from parallel_ratesheet_runner import parallel_process_ratesheets
 from place_of_service_extract import PlaceOfServiceExtract
 from plan_detail_extract import PlanDetailExtract
 from profiler import Profiler
+from provider_runner import run_all_providers
 import pstats
+from rate_group_key_factory import RateGroupKeyFactory
 from setup_environment import ensure_directories_exist
 from shared_config import SharedConfig
 import utilities
@@ -159,8 +161,12 @@ def main():
     #process_place_of_service_codes(context, base_params)
     #process_plan_details(context, base_params)
     
-    process_ratesheets(shared_config, networx_conn, qnxt_conn)
-    #parallel_process_ratesheets(shared_config)
+    rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(
+        shared_config, networx_conn, qnxt_conn)
+    
+    #rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
+
+    run_all_providers(shared_config, rate_group_key_factory)
 
     merge_all_outputs(shared_config)
     

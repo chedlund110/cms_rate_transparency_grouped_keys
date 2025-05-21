@@ -16,24 +16,29 @@ from section_handlers import (
     process_inpatient_exclusions
 )
 
-def process_single_provider(context: Context, provider_bundle: ProviderBundle) -> ProviderBundle:
-    # Load rate sheet (with caching)
-    if provider_bundle.rate_sheet_code in context.ratesheets:
-        rate_sheet = context.ratesheets[provider_bundle.rate_sheet_code]
-    else:
-        rate_sheet = load_ratesheet_by_code(context, provider_bundle.rate_sheet_code)
-        context.ratesheets[provider_bundle.rate_sheet_code] = rate_sheet
+from provider_bundle import ProviderBundle
+from rate_group_key_factory import RateGroupKeyFactory, RateGroupKey
+from context import Context
+from file_writer import write_provider_identifiers_record, write_provider_group_contract_xref
 
-    process_inpatient_per_diem(context, provider_bundle, rate_sheet.get("inpatient per diem", [])) 
-    process_inpatient_case_rate(context, provider_bundle, rate_sheet.get("inpatient case rate", []))
-    process_inpatient_services(context, provider_bundle, rate_sheet.get("inpatient services", []))
-    process_inpatient_exclusions(context, provider_bundle, rate_sheet.get("inpatient exclusions", []))
+
+def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dict) -> bool:
+    return all([
+        not qualifiers.get("TAXONOMY") or provider_bundle.taxonomy in qualifiers["TAXONOMY"],
+        not qualifiers.get("ZIP") or provider_bundle.zip in qualifiers["ZIP"],
+        not qualifiers.get("CONTRACT") or provider_bundle.contract_id in qualifiers["CONTRACT"]
+    ])
+
+def process_single_provider(
+        provider_bundle: ProviderBundle,
+        group_keys: dict[str, RateGroupKey],
+        context: Context
+    ) -> None:
     
-    process_outpatient_services(context, provider_bundle, rate_sheet.get("outpatient services", []))
-    process_outpatient_case_rate(context, provider_bundle, rate_sheet.get("outpatient case rate", []))
-    process_outpatient_per_diem(context, provider_bundle, rate_sheet.get("outpatient per diem", []))
-    process_outpatient_exclusions(context, provider_bundle, rate_sheet.get("outpatient exclusions", []))
-    
+    for group_key, rgk in group_keys.items():
+        if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers):
+            write_provider_identifiers_record(context, provider_bundle, group_key)
+            write_provider_group_contract_xref(context, provider_bundle, group_key)
     return provider_bundle
 
 def group_provider_rows_by_unique_key(provider_rows: list[dict[str, Any]]) -> dict[tuple[str, str], list[dict[str, Any]]]:
@@ -104,6 +109,7 @@ def fetch_providers(context) -> list[dict[str, Any]]:
     LEFT JOIN contractinfo CTR ON CTR.affiliationid = AFF.affiliationid
     LEFT JOIN ContractNxRateSheet CTRNX ON CTRNX.ContractId = CTR.contractid
     WHERE
+        PROV.PROVID = 'PRU21062770' AND 
         NxRateSheetId IS NOT NULL AND 
         NxRateSheetId LIKE 'AV%' AND 
         NxRateSheetId not like 'Z%' AND  
