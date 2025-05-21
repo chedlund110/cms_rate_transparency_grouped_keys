@@ -1,9 +1,10 @@
 from constants import GROUPER_COLUMN_MAP, rate_template
 from context import Context
+from rate_group_key_factory import RateGroupKeyFactory
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 
-def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle, rate_cache: dict):
+def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -46,11 +47,11 @@ def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle, rate
             "full_term_section_id": section_id,
             "calc_bean": calc_bean
         })
+        code_tuple = (proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-        dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
-
-def calc_asc_grouper_base(context: Context, term_bundle: TermBundle, rate_cache: dict):
+def calc_asc_grouper_base(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -88,6 +89,6 @@ def calc_asc_grouper_base(context: Context, term_bundle: TermBundle, rate_cache:
             "full_term_section_id": section_id,
             "calc_bean": calc_bean
         })
-
-        dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        code_tuple = (proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)

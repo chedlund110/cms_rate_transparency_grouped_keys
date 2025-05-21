@@ -8,7 +8,7 @@ def fetch_ratesheets(context) -> list[dict]:
     query: str = f"""
     SELECT * 
     FROM STDRATESHEETS
-    WHERE
+    WHERE 
         RATESHEETCODE IS NOT NULL AND 
         RATESHEETCODE LIKE 'AV%' AND 
         RATESHEETCODE not like 'Z%' AND  

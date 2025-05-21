@@ -3,6 +3,8 @@ from codegroup_tree import generate_service_combinations
 from context import Context
 from provider_bundle import ProviderBundle
 from provider_exclusions import check_provider_level_exclusions
+from rate_group_key_builder import build_group_keys_for_term
+from rate_group_key_factory import RateGroupKeyFactory
 from term_bundle import TermBundle
 from fee_schedule_loader import load_fee_schedule
 from calculation_router import CALCULATION_ROUTER
@@ -11,7 +13,7 @@ from utilities import get_dict_value
 from utilities import get_pos_and_type
 import time
 
-def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     # terms with subterms won't have a calculation method - skip them
     # the subterms will have the calculations
     calc_bean: str = term_bundle.calc_bean
@@ -42,12 +44,4 @@ def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict) ->
     # along with calc function to call
     calc_handler = CALCULATION_ROUTER.get(calc_bean)
     if calc_handler:
-        calc_handler(context, term_bundle, rate_cache)
-
-def derive_grouping_keys_for_term(
-    rate_sheet_code: str,
-    service_codes: set[str],
-    provider_qualifiers: dict,
-    existing_keys: set[str]
-) -> dict[str, set[str]]:
-    pass
+        calc_handler(context, term_bundle, rate_cache, rate_group_key_factory)

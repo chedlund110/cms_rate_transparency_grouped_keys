@@ -2,12 +2,13 @@ from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from provider_bundle import ProviderBundle
 from rate_storage import store_rate_record
+from rate_group_key_factory import RateGroupKeyFactory
 from term_bundle import TermBundle
 from file_writer import write_provider_identifiers_record
 from utilities import get_service_code_type, update_prov_grp_contract_keys
 
 
-def process_case_rate(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_case_rate(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
@@ -52,12 +53,12 @@ def process_case_rate(context: Context, term_bundle: TermBundle, rate_cache: dic
                     "full_term_section_id": section_id,
                     "calc_bean": calc_bean
                 }
-
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
             
-def process_case_rate_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_case_rate_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
@@ -103,10 +104,11 @@ def process_case_rate_limit(context: Context, term_bundle: TermBundle, rate_cach
                     "calc_bean": calc_bean
                 }
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
@@ -148,10 +150,11 @@ def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle, rate
                     "calc_bean": calc_bean
                 }
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -197,10 +200,11 @@ def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: Term
                     "calc_bean": calc_bean
                 }
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -246,5 +250,6 @@ def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: Te
                     "calc_bean": calc_bean
                 }
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)

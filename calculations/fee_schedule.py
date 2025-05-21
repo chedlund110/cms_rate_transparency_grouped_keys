@@ -1,16 +1,17 @@
 from context import Context
 from constants import DEFAULT_EXP_DATE
+from rate_group_key_factory import RateGroupKeyFactory
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_pos_and_type
 
-def process_fee_schedule(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_fee_schedule(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     if term_bundle.service_mod_pos_list:
-        process_fee_schedule_ranges(context, term_bundle, rate_cache)
+        process_fee_schedule_ranges(context, term_bundle, rate_cache, rate_group_key_factory)
     else:
-        process_fee_schedule_full(context, term_bundle, rate_cache)
+        process_fee_schedule_full(context, term_bundle, rate_cache, rate_group_key_factory)
 
-def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     calc_bean = term_bundle.calc_bean
@@ -55,9 +56,11 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
                 "full_term_section_id": section_id,
                 "calc_bean": calc_bean
             }
-            store_rate_record(rate_cache, dict_key, rate_dict)
+            rate_key: str = f"{term_bundle.rate_sheet_code}#{fee_schedule_name}"
+            code_tuple = (proc_code, modifier, rate_pos)
+            store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     calc_bean = term_bundle.calc_bean
@@ -110,4 +113,6 @@ def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle, rate_
             "full_term_section_id": section_id,
             "calc_bean": calc_bean
         }
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        rate_key: str = f"{term_bundle.rate_sheet_code}#{fee_schedule_name}"
+        code_tuple = (proc_code, modifier, rate_pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)

@@ -8,6 +8,7 @@ from database_connection import DatabaseConnection
 from file_batch_tracker import FileBatchTracker
 from buffered_rate_file_writer import BufferedRateFileWriter
 from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id  # <-- You'll define this module
+from rate_group_key_factory import RateGroupKeyFactory
 
 def parallel_process_ratesheets(shared_config: SharedConfig) -> None:
     tracker_path = os.path.join(shared_config.directory_structure["status_tracker_dir"], "ratesheet_status.json")
@@ -20,7 +21,7 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> None:
     qnxt_conn = DatabaseConnection(shared_config.qnxt_connection_string)
 
     context = build_context(shared_config, networx_conn, qnxt_conn)
-    
+    context.rate_group_key_factory = RateGroupKeyFactory()
     ratesheet_rows = fetch_ratesheets(context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)
 

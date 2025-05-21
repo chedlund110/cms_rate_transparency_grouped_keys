@@ -42,7 +42,11 @@ class RateGroupKeyFactory:
 
     def get(self, key: str) -> Optional[RateGroupKey]:
         return self.store.get(key)
-
+    
+    def merge(self, other: "RateGroupKeyFactory"):
+        for key, rate_group in other.store.items():
+            if key not in self.store:
+                self.store[key] = rate_group
     def all_keys(self) -> Dict[str, RateGroupKey]:
         return self.store
     

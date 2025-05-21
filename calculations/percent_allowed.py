@@ -1,25 +1,26 @@
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from provider_bundle import ProviderBundle
+from rate_group_key_factory import RateGroupKeyFactory
 from rate_storage import build_partial_indexes, store_rate_record
 from term_bundle import TermBundle
 from utilities import get_pos_and_type
 from decimal import Decimal, ROUND_HALF_UP
 
-def process_percent_of_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_percent_of_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     if term_bundle.service_mod_pos_list:
-        process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {})
+        process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {}, rate_group_key_factory)
     else:
-        process_percent_of_allowed_full(context, term_bundle, rate_cache)
+        process_percent_of_allowed_full(context, term_bundle, rate_cache, rate_group_key_factory)
 
-def process_percent_of_allowed_plus_fd_amt(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_percent_of_allowed_plus_fd_amt(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     if term_bundle.service_mod_pos_list:
-        process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {})
+        process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {}, rate_group_key_factory)
     else:
-        process_percent_of_allowed_full(context, term_bundle, rate_cache)
+        process_percent_of_allowed_full(context, term_bundle, rate_cache, rate_group_key_factory)
 
 def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle, rate_cache: dict,
-                                      proc_code_amount_xref) -> None:
+                                      proc_code_amount_xref, rate_group_key_factory: RateGroupKeyFactory) -> None:
     base_pct = term_bundle.base_pct_of_charge
     section_id = term_bundle.section_id
     rate_pos, rate_type_desc = get_pos_and_type(section_name='')
@@ -85,10 +86,11 @@ def process_percent_of_allowed_ranges(context: Context, term_bundle: TermBundle,
             "full_term_section_id": section_id,
             "calc_bean": calc_bean
         })
+        code_tuple = (proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-        store_rate_record(rate_cache, full_key, rate_dict)
-
-def process_percent_of_allowed_full(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_percent_of_allowed_full(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     base_pct = term_bundle.base_pct_of_charge
     for full_key, proc_details in rate_cache.items():
         raw_rate = proc_details.get("rate", 0)

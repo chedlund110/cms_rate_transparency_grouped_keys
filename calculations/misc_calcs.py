@@ -1,10 +1,11 @@
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
+from rate_group_key_factory import RateGroupKeyFactory
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_service_code_type
 
-def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -48,10 +49,11 @@ def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict
             "calc_bean": calc_bean
         })
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -91,10 +93,11 @@ def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cach
             "calc_bean": calc_bean
         })
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -134,10 +137,11 @@ def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_
             "calc_bean": calc_bean
         })
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -177,10 +181,11 @@ def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, 
             "calc_bean": calc_bean
         })
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -219,10 +224,11 @@ def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate
             "calc_bean": calc_bean
         })
 
+        code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict):
+def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -264,5 +270,6 @@ def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict):
             "calc_bean": calc_bean
         })
 
+        code_tuple = (ndc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, ndc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)

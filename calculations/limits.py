@@ -1,10 +1,11 @@
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
+from rate_group_key_factory import RateGroupKeyFactory
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_service_code_type
 
-def process_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -47,11 +48,11 @@ def process_limit(context: Context, term_bundle: TermBundle, rate_cache: dict) -
             "full_term_section_id": section_id,
             "calc_bean": calc_bean
         })
+        code_tuple = (proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-        dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
-
-def process_limit_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_limit_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -100,10 +101,11 @@ def process_limit_allowed(context: Context, term_bundle: TermBundle, rate_cache:
             "calc_bean": calc_bean
         })
 
-        dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        code_tuple = (proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_limit_allowed_percent(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_limit_allowed_percent(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -152,10 +154,11 @@ def process_limit_allowed_percent(context: Context, term_bundle: TermBundle, rat
             "calc_bean": calc_bean
         })
 
-        dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        code_tuple = (proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
-def process_limit_allowed_same_dos(context: Context, term_bundle: TermBundle, rate_cache: dict) -> None:
+def process_limit_allowed_same_dos(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
     if not service_mod_pos_list:
         return
@@ -204,5 +207,6 @@ def process_limit_allowed_same_dos(context: Context, term_bundle: TermBundle, ra
             "calc_bean": calc_bean
         })
 
-        dict_key = (fee_schedule_name, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict)
+        code_tuple = (proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
