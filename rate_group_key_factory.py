@@ -50,6 +50,8 @@ class RateGroupKeyFactory:
         return self.store
 
     def merge(self, other: "RateGroupKeyFactory"):
+        if other is None or other.store is None:
+            return
         for rate_sheet_code, keys_dict in other.store.items():
             for key, incoming_group in keys_dict.items():
                 if key not in self.store[rate_sheet_code]:

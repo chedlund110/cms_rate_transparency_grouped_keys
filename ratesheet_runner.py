@@ -22,9 +22,9 @@ def process_ratesheets(shared_config: SharedConfig, networx_conn, qnxt_conn) -> 
     ratesheet_rows = fetch_ratesheets(temp_context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)
 
-    LIMIT = 10  # For testing
-    grouped_values = list(grouped_ratesheets.values())[:LIMIT]
-    #grouped_values = list(grouped_ratesheets.values())
+    #LIMIT = 10  # For testing
+    #grouped_values = list(grouped_ratesheets.values())[:LIMIT]
+    grouped_values = list(grouped_ratesheets.values())
 
     ratesheet_batches = chunk_ratesheet_groups(grouped_values, batch_size=5)
 
