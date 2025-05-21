@@ -106,21 +106,23 @@ def get_service_code_type(proc_code: str) -> str:
     return proc_code_type
 
 def update_prov_grp_contract_keys(provider_bundle: ProviderBundle, rate_key: str = '') -> bool:
-    xref_key = (provider_bundle.provid, provider_bundle.rate_sheet_code)
+    # Create the xref_key as a tuple of (program_id, rate_key)
+    xref_key = (provider_bundle.program_id, rate_key)
     xref_exists = xref_key in provider_bundle.prov_grp_contract_keys
 
-    # Ensure the entry exists
+    # Ensure that xref_key maps to a dictionary with "programs" and "rate_keys" as lists
     xref_entry = provider_bundle.prov_grp_contract_keys.setdefault(
         xref_key,
-        {"programs": set(), "rate_keys": set()}
+        {"programs": [], "rate_keys": []}  # Store "programs" and "rate_keys" as lists
     )
 
     # Add all programs tied to this provider/rate_sheet
     for program_id in provider_bundle.program_list:
-        xref_entry["programs"].add(program_id)
+        if program_id not in xref_entry["programs"]:
+            xref_entry["programs"].append(program_id)
 
     # Add the rate_key if it’s valid
-    if rate_key:
-        xref_entry["rate_keys"].add(rate_key)
+    if rate_key and rate_key not in xref_entry["rate_keys"]:
+        xref_entry["rate_keys"].append(rate_key)
 
-    return xref_exists  # True if key existed before, False if it was just created
+    return xref_exists, xref_entry  # Return both the existence and the updated entry

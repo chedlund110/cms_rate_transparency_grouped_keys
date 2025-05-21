@@ -3,7 +3,7 @@ from constants import TAXONOMY_ATTRIBUTE_ID
 from context import Context
 from collections import defaultdict
 from provider_bundle import ProviderBundle
-from utilities import build_in_clause_from_list
+from utilities import build_in_clause_from_list, update_prov_grp_contract_keys
 from ratesheet_loader import load_ratesheet_by_code
 from section_handlers import (
     process_outpatient_services,
@@ -19,7 +19,7 @@ from section_handlers import (
 from provider_bundle import ProviderBundle
 from rate_group_key_factory import RateGroupKeyFactory, RateGroupKey
 from context import Context
-from file_writer import write_provider_identifiers_record, write_provider_group_contract_xref
+from file_writer import write_provider_identifiers_record, write_prov_grp_contract_file
 
 
 def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dict) -> bool:
@@ -37,8 +37,12 @@ def process_single_provider(
     
     for group_key, rgk in group_keys.items():
         if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers):
+            # 💡 Add this line to populate the contract key structure
+            update_prov_grp_contract_keys(provider_bundle, group_key)
+
             write_provider_identifiers_record(context, provider_bundle, group_key)
-            write_provider_group_contract_xref(context, provider_bundle, group_key)
+            write_prov_grp_contract_file(context, provider_bundle, group_key)
+
     return provider_bundle
 
 def group_provider_rows_by_unique_key(provider_rows: list[dict[str, Any]]) -> dict[tuple[str, str], list[dict[str, Any]]]:
@@ -110,6 +114,7 @@ def fetch_providers(context) -> list[dict[str, Any]]:
     LEFT JOIN ContractNxRateSheet CTRNX ON CTRNX.ContractId = CTR.contractid
     WHERE
         PROV.PROVID = 'PRU21062770' AND 
+        NxRateSheetId = 'AVCRPRF00159' AND 
         NxRateSheetId IS NOT NULL AND 
         NxRateSheetId LIKE 'AV%' AND 
         NxRateSheetId not like 'Z%' AND  

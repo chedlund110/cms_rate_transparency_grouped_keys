@@ -36,19 +36,24 @@ def write_provider_identifiers_record(
     # Use the open file handle from context
     context.provider_identifier_output_file.write(output_rec)
 
-def write_prov_grp_contract_file(context: Context, provider_bundle: ProviderBundle) -> None:
+def write_prov_grp_contract_file(context: Context, provider_bundle: ProviderBundle, group_key: str) -> None:
     f = context.prov_grp_contract_output_file
 
-    for xref_key, xref_details in provider_bundle.prov_grp_contract_keys.items():
-        programs: set = xref_details.get("programs", set())
-        rate_keys: set = xref_details.get("rate_keys", set())
+    # Use program_id and rate_key for the xref_key
+    xref_block = provider_bundle.prov_grp_contract_keys.get((provider_bundle.program_id, group_key), {})
 
-        for program_id in programs:
-            for rate_key in rate_keys:
-                if rate_key:
-                    data_fields = [context.insurer_code, program_id, rate_key]
-                    output_rec = FIELD_DELIM.join(data_fields) + '\n'
-                    f.write(output_rec)
+
+    # xref_details should be a dictionary with "programs" and "rate_keys" as lists
+    programs = xref_block.get("programs", [])  # Default to empty list if not found
+    rate_keys = xref_block.get("rate_keys", [])  # Default to empty list if not found
+
+    # Now we can safely loop through programs and rate_keys, since they are both lists
+    for program_id in programs:
+        for rate_key in rate_keys:
+            if rate_key:
+                data_fields = [context.insurer_code, program_id, rate_key]
+                output_rec = FIELD_DELIM.join(data_fields) + '\n'
+                f.write(output_rec)
 
 def write_rate_records(context: Context, provider_bundle: ProviderBundle) -> None:
     for rate_tuple, serv_dict in provider_bundle.provider_rates_temp.items():

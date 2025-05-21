@@ -74,6 +74,8 @@ class RateGroupKeyFactory:
         self.store[base][remainder_key] = RateGroupKey(key=remainder_key, codes=codes, qualifiers=None)
         return remainder_key
 
+    def get_keys_for_ratesheet(self, rate_sheet_code: str) -> dict[str, RateGroupKey]:
+        return self.store.get(rate_sheet_code, {})
 
 # Utility function to merge a list of factories
 def merge_rate_group_key_factories(factories: list[RateGroupKeyFactory]) -> RateGroupKeyFactory:
