@@ -26,8 +26,8 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFact
     ratesheet_rows = fetch_ratesheets(context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)
 
-    #LIMIT = 100  # Optional for testing
-    #grouped_values = list(grouped_ratesheets.values())[:LIMIT]
+    LIMIT = 100  # Optional for testing
+    grouped_values = list(grouped_ratesheets.values())[:LIMIT]
     grouped_values = list(grouped_ratesheets.values())
     batches = chunk_ratesheet_groups(grouped_values, batch_size=15)
 

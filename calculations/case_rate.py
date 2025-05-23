@@ -7,7 +7,6 @@ from term_bundle import TermBundle
 from file_writer import write_provider_identifiers_record
 from utilities import get_service_code_type, update_prov_grp_contract_keys
 
-
 def process_case_rate(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
