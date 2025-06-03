@@ -73,3 +73,16 @@ def load_ndc_codes(conn) -> dict:
     for row in rows
     if row.get("NDCCODE",'') and row.get("UNITPRICE",'') is not None
 }
+
+def load_drg_weights(conn) -> dict:
+    query = """
+    SELECT DRG, RELATIVEWEIGHT, SOURCETYPE, YEARAPPLIED, EFFECTIVEDATE, TERMINATIONDATE 
+    FROM DRGWEIGHTS 
+    WHERE GETDATE() BETWEEN EFFECTIVEDATE AND TERMINATIONDATE
+    """
+    rows = conn.execute_query_with_columns(query)
+    return {
+    (row["DRG"], row["SOURCETYPE"], row["YEARAPPLIED"])
+    for row in rows
+    if row.get("AMBSURGGRPCODE") and row.get("SOURCETYPE") and row.get("YEARAPPLIED") is not None and row.get("ASCGROUPNUMBER") is not None
+}

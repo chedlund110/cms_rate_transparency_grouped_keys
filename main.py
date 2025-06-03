@@ -11,7 +11,7 @@ Chris Hedlund - 2025
 
 from billing_code_extract import BillingCodeExtract
 from clean_output_folders import clear_output_folders 
-from codegroup_loader import load_code_groups, load_ambsurg_codes, load_ndc_codes
+from codegroup_loader import load_code_groups, load_ambsurg_codes, load_ndc_codes, load_drg_weights
 from context import Context
 from context_factory import build_context
 import cProfile
@@ -145,6 +145,7 @@ def main():
     shared_config.codegroups = load_code_groups(networx_conn)
     shared_config.amb_surg_codes = load_ambsurg_codes(networx_conn)
     shared_config.ndc_codes = load_ndc_codes(networx_conn)
+    shared_config.drg_weights = load_drg_weights(networx_conn)
 
     context = build_context(shared_config, networx_conn, qnxt_conn)
     
