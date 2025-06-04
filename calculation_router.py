@@ -10,6 +10,10 @@ from calculations.case_rate import(
     process_case_rate_three_lev_per_diem_limit,
     process_cr_ltd_by_pct_of_chg
 )
+from calculations.drg import (
+    process_drg_weighting,
+    process_drg_weighting_day_outlier
+)
 from calculations.limits import (
     process_limit,
     process_limit_allowed,
@@ -57,6 +61,8 @@ CALCULATION_ROUTER = {
     'CalcCaseRateTwoLevPerDiemLimit': process_case_rate_two_lev_per_diem_limit,
     'CalcCaseRateThreeLevPerDiemLimit': process_case_rate_three_lev_per_diem_limit,
     'CalcCRLtdByPctOfChg': process_cr_ltd_by_pct_of_chg,
+    'CalcDRGWeighting': process_drg_weighting,
+    'CalcDRGWeightingDayOutlier': process_drg_weighting_day_outlier,
     'CalcFlatDollarDiscount': process_flat_dollar_discount,
     'CalcLimit': process_limit,
     'CalcLimitAllowedPercent': process_limit_allowed_percent,

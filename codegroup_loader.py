@@ -82,7 +82,7 @@ def load_drg_weights(conn) -> dict:
     """
     rows = conn.execute_query_with_columns(query)
     return {
-    (row["DRG"], row["SOURCETYPE"], row["YEARAPPLIED"])
+    (row["DRG"], row["RELATIVEWEIGHT"], row["SOURCETYPE"], row["YEARAPPLIED"])
     for row in rows
-    if row.get("AMBSURGGRPCODE") and row.get("SOURCETYPE") and row.get("YEARAPPLIED") is not None and row.get("ASCGROUPNUMBER") is not None
+    if row.get("DRG") and row.get("RELATIVEWEIGHT") and row.get("SOURCETYPE") and row.get("YEARAPPLIED")
 }
