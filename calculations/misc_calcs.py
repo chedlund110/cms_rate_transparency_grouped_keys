@@ -1,3 +1,4 @@
+from calculations.fee_schedule import process_fee_schedule
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from rate_group_key_factory import RateGroupKeyFactory
@@ -273,3 +274,9 @@ def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rat
         code_tuple = (ndc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, ndc_code, modifier, pos)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
+
+def process_optum_physician_pricer(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
+    # for the professional optim pricer, we just need to use the global rate sheet
+    # on the term and extract the fee schedules using the existing function
+    process_fee_schedule(context, term_bundle, rate_cache, rate_group_key_factory)
+

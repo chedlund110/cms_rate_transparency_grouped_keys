@@ -25,7 +25,8 @@ from calculations.misc_calcs import (
     process_per_item,
     process_percent_plus_excess,
     process_unit_ltd_by_chg,
-    process_visit_plus_rate_per_hour
+    process_visit_plus_rate_per_hour,
+    process_optum_physician_pricer
 )
 from calculations.percent_allowed import (
     process_percent_of_allowed,
@@ -68,6 +69,7 @@ CALCULATION_ROUTER = {
     'CalcLimitAllowedPercent': process_limit_allowed_percent,
     'CalcNDC': process_ndc,
     'CalcNtwxStdFeeSched': process_fee_schedule,
+    'CalcOptumPhysicianPricer': process_optum_physician_pricer,
     'CalcPctChgPDMax': process_pct_chg_pd_max,
     'CalcPctChgPDMax_01': process_pct_chg_pd_max_01,
     'CalcPctChgPerUnitThreshold': process_pct_chg_per_unit_threshold,

@@ -47,6 +47,7 @@ def load_ratesheet(context: Context, query: str, rate_sheet_code: str = None) ->
     return rate_sheet
 
 def load_ratesheet_by_code(context: Context, rate_sheet_code: str) -> dict[str, list[dict[str, Any]]]:
+    rate_sheet_code = 'AVCRACH00011'
     query = f"""
     SELECT 
         SRST.CALCBEAN, SRST.ACTIONPARM1, SRST.BASEPERCENTOFCHGS, SRST.CODEGROUPID,

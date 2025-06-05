@@ -162,9 +162,9 @@ def main():
     process_place_of_service_codes(context, base_params)
     process_plan_details(context, base_params)
     
-    #rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
+    rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
     
-    rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
+    # rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
 
     run_all_providers(shared_config, rate_group_key_factory)
 
