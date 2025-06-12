@@ -1,3 +1,7 @@
+# some of these calculation functions are the same
+# I still split them out into their own functions
+# since they could have modifications independently
+
 from calculations.fee_schedule import process_fee_schedule
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template

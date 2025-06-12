@@ -45,3 +45,5 @@ def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict, ra
     calc_handler = CALCULATION_ROUTER.get(calc_bean)
     if calc_handler:
         calc_handler(context, term_bundle, rate_cache, rate_group_key_factory)
+
+    
