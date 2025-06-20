@@ -41,6 +41,9 @@ def load_ratesheet(context: Context, query: str, rate_sheet_code: str = None) ->
         term["subterms"] = []
         if sub_rate_sheet_id and sub_rate_sheet_ind == 0:
             term["subterms"] = load_subterms(context, sub_rate_sheet_id, term)
+        else:
+            if term["CALCBEAN"] == 'CalcOptumPhysicianPricer':
+                term["subterms"] = load_subterms(context, '4649', term)
 
         rate_sheet[section_name].append(term)
 

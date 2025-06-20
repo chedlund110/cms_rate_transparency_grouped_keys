@@ -280,7 +280,8 @@ def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rat
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
 
 def process_optum_physician_pricer(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    # for the professional optim pricer, we just need to use the global rate sheet
+    # for the professional optum pricer, we just need to use the global rate sheet
     # on the term and extract the fee schedules using the existing function
+    # the global rate sheet we need to use is AVGB00000013
     process_fee_schedule(context, term_bundle, rate_cache, rate_group_key_factory)
 

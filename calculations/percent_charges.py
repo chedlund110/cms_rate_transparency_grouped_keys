@@ -23,6 +23,13 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_c
 
     if not ranges:
         return
+    
+    if base_pct_of_charge:
+        fee = base_pct_of_charge * 100
+        fee_type = 'percentage'
+    else:
+        fee = term_bundle.base_rate1
+        fee_type = 'negotiated'
 
     for proc_code, modifier, pos in ranges:
         if pos == '' or pos == '11':
@@ -30,15 +37,7 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_c
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
         allow_amt = 0
-
-        if percentage > 0:
-            fee = percentage * 100
-            fee_type = "percentage"
-        else:
-            fee = allow_amt
-            fee_type = "negotiated"
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -71,7 +70,7 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -89,9 +88,6 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -125,7 +121,7 @@ def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, ra
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -139,9 +135,6 @@ def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, ra
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -175,7 +168,7 @@ def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle,
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -189,9 +182,6 @@ def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle,
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -225,7 +215,7 @@ def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -239,9 +229,6 @@ def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -275,7 +262,7 @@ def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_ca
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -289,9 +276,6 @@ def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_ca
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -326,7 +310,7 @@ def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle, rate
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -340,9 +324,6 @@ def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle, rate
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -376,7 +357,7 @@ def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -390,9 +371,6 @@ def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({
@@ -426,7 +404,7 @@ def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_ca
     base_pct_of_charge = term_bundle.base_pct_of_charge
     ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#{fee_schedule_name}"
+    rate_key = f"{rate_sheet_code}#pct_chgs"
 
     if not ranges:
         return
@@ -440,9 +418,6 @@ def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_ca
                 pos = '21'
         proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
-        percentage = base_pct_of_charge
-
-        fee, fee_type = get_fee_and_type(fee, percentage)
 
         rate_dict = rate_template.copy()
         rate_dict.update({

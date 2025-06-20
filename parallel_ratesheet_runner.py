@@ -8,6 +8,7 @@ from shared_config import SharedConfig
 from database_connection import DatabaseConnection
 from file_batch_tracker import FileBatchTracker
 from buffered_rate_file_writer import BufferedRateFileWriter
+from pathlib import Path
 from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id
 from rate_group_key_factory import RateGroupKeyFactory, merge_rate_group_key_factories
 
@@ -48,6 +49,9 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFact
     with ctx.Pool(processes=num_processes) as pool:
         rate_group_key_factories = pool.starmap(process_ratesheet_batch_safe, args_list)
 
+    # ✅ All child processes have completed here
+    #flag_path = os.path.join(shared_config.directory_structure["temp_output_dir"], "ratesheets_done.flag")
+    #Path(flag_path).touch()  # This is the flag!
     # Merge all per-worker dicts into a single dict
     merged_keys = merge_rate_group_key_factories(rate_group_key_factories)
     return merged_keys

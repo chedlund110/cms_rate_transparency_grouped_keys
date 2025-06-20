@@ -22,6 +22,8 @@ from merge_output_files import merge_all_outputs
 import os
 from ratesheet_runner import process_ratesheets
 from parallel_ratesheet_runner import parallel_process_ratesheets
+from time import sleep
+from pathlib import Path
 from place_of_service_extract import PlaceOfServiceExtract
 from plan_detail_extract import PlanDetailExtract
 from profiler import Profiler
@@ -72,6 +74,14 @@ def process_plan_details(context: Context, base_params):
     plan_detail_extract.extract_data()
     utilities.create_mms_file(plan_detail_full_path,plan_detail_extract.records_processed)
 
+def wait_for_flag(flag_path: str, timeout: int = 300):
+    waited = 0
+    while not Path(flag_path).exists():
+        sleep(5)
+        waited += 5
+        if waited >= timeout:
+            raise TimeoutError(f"Timed out waiting for {flag_path}")
+        
 def main():
 
     # The parameters to run the rpocess are in config.json
@@ -162,9 +172,14 @@ def main():
     process_place_of_service_codes(context, base_params)
     process_plan_details(context, base_params)
     
-    rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
+    # rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
     
-    # rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
+    # parallel process or regular process rate sheets
+    rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
+
+    # wait until all child processes are done writing rates
+    # after the pool.starmap, the 'trigger' file is written
+    #wait_for_flag(os.path.join(shared_config.directory_structure["temp_output_dir"], "ratesheets_done.flag"))
 
     run_all_providers(shared_config, rate_group_key_factory)
 

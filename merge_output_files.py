@@ -62,6 +62,10 @@ def merge_contract_xrefs(shared_config: SharedConfig) -> None:
     create_mms_file(output_file_path, count_file_lines(output_file_path))
 
 def merge_negotiated_rate_files(shared_config: SharedConfig) -> None:
+
+    MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024  # 5 GB
+    MAX_BUFFER_SIZE = 100 * 1024 * 1024     # 100 MB buffer flush limit
+    
     print("🔀 Merging negotiated rate files with 5GB limit per file (buffered write)...")
 
     merged_file_index = 1
@@ -82,15 +86,21 @@ def merge_negotiated_rate_files(shared_config: SharedConfig) -> None:
         merged_file_index += 1
         return os.path.join(output_dir, filename)
 
-    current_file_path = create_new_output_file()
+    def flush_buffer(file_path: str, buf: BytesIO):
+        size = buf.tell()
+        if size == 0:
+            return  # nothing to flush
+        try:
+            with open(file_path, "ab") as f:
+                with BufferedWriter(f, buffer_size=10_000_000) as out:
+                    out.write(buf.getvalue())
+                    out.flush()
+            buf.seek(0)
+            buf.truncate(0)
+        except Exception as e:
+            print(f"❌ Exception while flushing buffer to {file_path}: {e}")
 
-    def flush_buffer(file_path: str):
-        nonlocal buffer
-        with open(file_path, "ab") as f:
-            with BufferedWriter(f, buffer_size=10_000_000) as out:
-                out.write(buffer.getvalue())
-                out.flush()
-        buffer = BytesIO()
+    current_file_path = create_new_output_file()
 
     for file in sorted(os.listdir(negotiated_dir)):
         if file.endswith(".TXT") and file.startswith("NEGOTIATED"):
@@ -101,8 +111,9 @@ def merge_negotiated_rate_files(shared_config: SharedConfig) -> None:
                         encoded_line = line.encode("utf-8")
                         line_size = len(encoded_line)
 
+                        # If adding this line would exceed max file size, flush & rotate file first
                         if current_file_size + line_size > MAX_FILE_SIZE:
-                            flush_buffer(current_file_path)
+                            flush_buffer(current_file_path, buffer)
                             create_mms_file(current_file_path, current_record_count)
                             current_file_path = create_new_output_file()
                             current_file_size = 0
@@ -112,11 +123,15 @@ def merge_negotiated_rate_files(shared_config: SharedConfig) -> None:
                         current_file_size += line_size
                         current_record_count += 1
 
+                        # Flush early if buffer too big, to limit memory use
+                        if buffer.tell() >= MAX_BUFFER_SIZE:
+                            flush_buffer(current_file_path, buffer)
+
             except Exception as e:
                 print(f"⚠️ Skipping unreadable or locked file {full_path}: {e}")
 
-    # Final flush
-    flush_buffer(current_file_path)
+    # Final flush for remaining data
+    flush_buffer(current_file_path, buffer)
     create_mms_file(current_file_path, current_record_count)
 
 def create_mms_file(filename: str, rec_cnt: int) -> None:
@@ -131,7 +146,7 @@ def count_file_lines(file_path: str) -> int:
 def get_shared_config():
     config = load_config("./config/config.json")
     if config is None:
-        return
+        return None
 
     app_base_dir = config["app_base_directory"]
 
@@ -140,13 +155,24 @@ def get_shared_config():
         for key, path in config["directory_structure"].items()
     }
 
-    shared_config = SharedConfig(
-        app_base_directory=app_base_dir,
-        directory_structure=directory_structure,
+    mrf_target_directory = os.path.join(app_base_dir, config["directory_structure"]["mrf_output_dir"])
+
+    return SharedConfig(
+        reporting_entity=config.get("reporting_entity", ""),
+        reporting_entity_type=config.get("reporting_entity_type", ""),
+        insurer_code=config.get("insurer_code", ""),
+        program_list=config.get("programs", []),
+        provider_code_range_types=config.get("provider_code_range_types", []),
+        service_code_range_types=config.get("service_code_range_types", []),
+        service_code_companion_range_types=config.get("service_companion_code_types", []),
+        mrf_target_directory=mrf_target_directory,
         mrf_file_prefixes=config["mrf_file_prefixes"],
-        mrf_target_directory=os.path.join(app_base_dir, config["mrf_target_directory"])
+        provider_identifier_full_path="",
+        prov_grp_contract_full_path="",
+        networx_connection_string="",
+        qnxt_connection_string="",
+        directory_structure=directory_structure
     )
-    return shared_config
 
 if __name__ == "__main__":
     shared_config = get_shared_config()
