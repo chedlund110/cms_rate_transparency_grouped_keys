@@ -18,6 +18,7 @@ def process_ratesheets(shared_config: SharedConfig, networx_conn, qnxt_conn) -> 
     # Temporary context just to load rate sheet rows
     temp_context = build_context(shared_config, networx_conn, qnxt_conn)
     temp_context.rate_group_key_factory = RateGroupKeyFactory()
+    temp_context.shared_config = shared_config
 
     ratesheet_rows = fetch_ratesheets(temp_context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)

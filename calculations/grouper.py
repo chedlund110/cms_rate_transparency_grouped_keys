@@ -49,7 +49,7 @@ def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle, rate
         })
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def calc_asc_grouper_base(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
     fee_schedule_name = term_bundle.fee_schedule_name
@@ -91,4 +91,4 @@ def calc_asc_grouper_base(context: Context, term_bundle: TermBundle, rate_cache:
         })
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)

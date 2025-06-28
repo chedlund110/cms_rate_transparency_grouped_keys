@@ -9,15 +9,21 @@ def store_rate_record(
     group_key: str = None,
     key_factory: RateGroupKeyFactory = None,
     code_tuple: tuple[str, str, str] = None,
+    valid_service_codes: tuple[str,str] = None
 ) -> None:
     """
     Stores a rate record for a single rate sheet using a temporary dict.
     Also updates the group key with the procedure code used.
     """
+    proc_code, modifier, pos = code_tuple
+    valid_code_key: str = (proc_code, rate_dict["billing_code_type"])
+    if valid_code_key not in valid_service_codes:
+        return
+    
     rate_cache[dict_key] = rate_dict
 
     if group_key and key_factory and code_tuple:
-        proc_code, modifier, pos = code_tuple
+
         rate_sheet_code = group_key.split("#")[0]
 
         key = key_factory.get_keys_for_rate_sheet(rate_sheet_code).get(group_key)

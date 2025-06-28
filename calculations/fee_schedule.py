@@ -58,7 +58,7 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
             }
             rate_key: str = f"{term_bundle.rate_sheet_code}#{fee_schedule_name}"
             code_tuple = (proc_code, modifier, rate_pos)
-            store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
+            store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     fee_schedule_name = term_bundle.fee_schedule_name
@@ -110,7 +110,7 @@ def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle, rate_
                         "full_term_section_id": section_id,
                         "calc_bean": calc_bean
                     }
-                    store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, (procedure_code, modifier, rate_pos))
+                    store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, (procedure_code, modifier, rate_pos), context.shared_config.valid_service_codes)
 
         # After processing all procedure codes under the modifier, process the specific proc_code and fallback
         if proc_code and proc_details:
@@ -138,4 +138,4 @@ def process_fee_schedule_ranges(context: Context, term_bundle: TermBundle, rate_
                 "full_term_section_id": section_id,
                 "calc_bean": calc_bean
             }
-            store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, (proc_code, modifier, rate_pos))
+            store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, (proc_code, modifier, rate_pos), context.shared_config.valid_service_codes)

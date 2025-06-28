@@ -34,15 +34,17 @@ from setup_environment import ensure_directories_exist
 from shared_config import SharedConfig
 import utilities
 
-def process_billing_codes(context: Context, base_params):
+def process_billing_codes(context: Context, shared_config, base_params) -> None:
+    valid_service_codes: set = set()
     billing_code_filename = context.shared_config.mrf_file_prefixes['billing_code']
     billing_code_ext = context.shared_config.mrf_file_prefixes['billing_code_ext']
     billing_code_filename = utilities.format_date_for_filename(billing_code_filename,billing_code_ext)
     billing_code_full_path = os.path.join(context.shared_config.mrf_target_directory,billing_code_filename)
     billing_output_file = open(billing_code_full_path, mode='w', encoding='utf-8')
     billing_code_extract = BillingCodeExtract(context.qnxt_conn, billing_output_file)
-    billing_code_extract.extract_data()
+    valid_service_codes = billing_code_extract.extract_data()
     utilities.create_mms_file(billing_code_full_path,billing_code_extract.records_processed)
+    shared_config.valid_service_codes = valid_service_codes
 
 def process_place_of_service_codes(context: Context, base_params):
     place_of_service_filename = context.shared_config.mrf_file_prefixes["place_of_service"]
@@ -168,18 +170,15 @@ def main():
     """
 
     # Stand-alone extracts
-    process_billing_codes(context, base_params)
+    process_billing_codes(context, shared_config, base_params)
     process_place_of_service_codes(context, base_params)
     process_plan_details(context, base_params)
     
-    # rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
+    # standalone rate runner
+    #rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
     
-    # parallel process or regular process rate sheets
+    # parallel process runner
     rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
-
-    # wait until all child processes are done writing rates
-    # after the pool.starmap, the 'trigger' file is written
-    #wait_for_flag(os.path.join(shared_config.directory_structure["temp_output_dir"], "ratesheets_done.flag"))
 
     run_all_providers(shared_config, rate_group_key_factory)
 

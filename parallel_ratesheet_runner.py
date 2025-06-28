@@ -24,6 +24,7 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFact
 
     context = build_context(shared_config, networx_conn, qnxt_conn)
     context.rate_group_key_factory = RateGroupKeyFactory()
+    context.shared_config = shared_config
     ratesheet_rows = fetch_ratesheets(context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)
 

@@ -46,7 +46,7 @@ def process_drg_weighting(context: Context, term_bundle: TermBundle, rate_cache:
                 }
         code_tuple = (drg_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, drg_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_drg_weighting_day_outlier(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     
@@ -87,4 +87,4 @@ def process_drg_weighting_day_outlier(context: Context, term_bundle: TermBundle,
                 }
         code_tuple = (drg_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, drg_code, modifier, pos)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)

@@ -6,14 +6,17 @@ class RevCodeExtract:
         self.conn = db_conn
         self.output_file = output_file
 
-    def extract_data(self) -> int:
+    def extract_data(self) -> tuple[int,set]:
         rec_cnt: int  = 0
+        valid_service_codes: set = set()
         query: str = "SELECT codeid, description FROM revcode"
         results: list[dict[str,Any]] = self.conn.execute_query_with_columns(query)
         row: str = ""
         for row in results:
-            line = '|'.join([str(row.get("codeid", "")).strip(),"RC","10",str(row.get("description", "")).strip(),""]) + '\n'
+            code_id: str = str(row.get("codeid","").strip())
+            line = '|'.join([code_id,"RC","10",str(row.get("description", "")).strip(),""]) + '\n'
             self.output_file.write(line)
             rec_cnt += 1
-        return rec_cnt
+            valid_service_codes.add((code_id,"RC"))
+        return rec_cnt, valid_service_codes
             
