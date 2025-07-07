@@ -19,6 +19,7 @@ from database_connection import DatabaseConnection
 from datetime import datetime
 import json
 from merge_output_files import merge_all_outputs
+from modifier_loader import load_modifier_map
 import os
 from ratesheet_runner import process_ratesheets
 from parallel_ratesheet_runner import parallel_process_ratesheets
@@ -159,6 +160,9 @@ def main():
     shared_config.ndc_codes = load_ndc_codes(networx_conn)
     shared_config.drg_weights = load_drg_weights(networx_conn)
 
+    reference_dir = shared_config.directory_structure["reference_dir"]
+    modifier_path = os.path.join(reference_dir, "procedure_modifier_map.txt")
+    modifier_map = load_modifier_map(modifier_path)
     context = build_context(shared_config, networx_conn, qnxt_conn)
     
     ensure_directories_exist(shared_config)

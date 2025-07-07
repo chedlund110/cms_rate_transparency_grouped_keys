@@ -22,7 +22,8 @@
         "status_tracker_dir": "status_tracker",
         "temp_output_dir": "temp_output",
         "log_dir": "logs",
-        "test_output_dir": "test_scripts"
+        "test_output_dir": "test_scripts",
+        "reference_dir": "reference"
     },
     "mrf_file_prefixes": {
         "billing_code": "5397-_-6511E119182-_-AVMED_BILLING_CODES_",
