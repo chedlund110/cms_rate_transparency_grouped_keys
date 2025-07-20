@@ -39,11 +39,10 @@ class Context:
         self.mrf_file_prefixes = mrf_file_prefixes
         self.codegroups = {}
         self.fee_schedules = {}
+        self.fee_schedule_types = {}
         self.ratesheets = {}
         self.provider_identifier_output_file = provider_identifier_output_file
         self.prov_grp_contract_output_file = prov_grp_contract_output_file
         self.shared_config = shared_config
         self.statistics = StatisticsTracker()
         self.codegroup_trees: dict[int, dict] = {}
-        self.locality_info_rows = None
-        self.locality_zip_ranges = None

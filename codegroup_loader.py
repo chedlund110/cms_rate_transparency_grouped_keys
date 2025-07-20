@@ -86,3 +86,25 @@ def load_drg_weights(conn) -> dict:
     for row in rows
     if row.get("DRG") and row.get("RELATIVEWEIGHT") and row.get("SOURCETYPE") and row.get("YEARAPPLIED")
 }
+
+def load_locality_zip_ranges(conn) -> list[tuple[str, str, str, str]]:
+    """
+    Load (carrier, locality, begin_zip, end_zip) tuples from RBRVSZIP.
+    """
+    query = """
+        SELECT LOCALITYNUMBER, CARRIERNUMBER, BEGINZIP, ENDZIP
+        FROM RBRVSZIP
+        WHERE GETDATE() BETWEEN EFFECTIVEDATE AND TERMINATIONDATE
+    """
+    rows = conn.execute_query_with_columns(query)
+
+    return [
+        (
+            row["CARRIERNUMBER"].strip(),
+            row["LOCALITYNUMBER"].strip(),
+            row["BEGINZIP"].strip(),
+            row["ENDZIP"].strip()
+        )
+        for row in rows
+        if row.get("CARRIERNUMBER") and row.get("LOCALITYNUMBER")
+    ]

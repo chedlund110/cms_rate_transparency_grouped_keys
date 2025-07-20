@@ -37,7 +37,9 @@ def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict, ra
     fee_schedule_name: str = term_bundle.fee_schedule_name
     if fee_schedule_name:
         if fee_schedule_name not in context.fee_schedules:
-            load_fee_schedule(context, fee_schedule_name)
+            locality_keys = load_fee_schedule(context, fee_schedule_name)
+            if locality_keys:
+                term_bundle.locality_fee_schedule_keys = locality_keys
     
     # see the calculation_router module
     # each calculation type is in there

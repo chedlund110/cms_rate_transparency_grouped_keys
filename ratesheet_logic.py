@@ -1,8 +1,5 @@
 # ratesheet_logic.py
 
-def process_single_ratesheet() -> None:
-    pass
-
 def fetch_ratesheets(context) -> list[dict]:
     # Your SQL or logic to pull rate sheet–driven data
     query: str = f"""

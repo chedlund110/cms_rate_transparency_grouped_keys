@@ -2,8 +2,6 @@
 main.py
 
 Entry point for the process.
-Calls individual supporting file creation.
-Calls either the standalone provider_runner or the multi-processing version parallel_runner.
 
 Chris Hedlund - 2025
 
@@ -11,12 +9,13 @@ Chris Hedlund - 2025
 
 from billing_code_extract import BillingCodeExtract
 from clean_output_folders import clear_output_folders 
-from codegroup_loader import load_code_groups, load_ambsurg_codes, load_ndc_codes, load_drg_weights
+from codegroup_loader import load_code_groups, load_ambsurg_codes, load_ndc_codes, load_drg_weights, load_locality_zip_ranges
 from context import Context
 from context_factory import build_context
 import cProfile
 from database_connection import DatabaseConnection
 from datetime import datetime
+from fee_schedule_loader import preload_all_locality_fee_schedules
 import json
 from merge_output_files import merge_all_outputs
 from modifier_loader import load_modifier_map
@@ -76,14 +75,6 @@ def process_plan_details(context: Context, base_params):
     plan_detail_extract = PlanDetailExtract(params)
     plan_detail_extract.extract_data()
     utilities.create_mms_file(plan_detail_full_path,plan_detail_extract.records_processed)
-
-def wait_for_flag(flag_path: str, timeout: int = 300):
-    waited = 0
-    while not Path(flag_path).exists():
-        sleep(5)
-        waited += 5
-        if waited >= timeout:
-            raise TimeoutError(f"Timed out waiting for {flag_path}")
         
 def main():
 
@@ -159,12 +150,13 @@ def main():
     shared_config.amb_surg_codes = load_ambsurg_codes(networx_conn)
     shared_config.ndc_codes = load_ndc_codes(networx_conn)
     shared_config.drg_weights = load_drg_weights(networx_conn)
+    shared_config.locality_zip_ranges = load_locality_zip_ranges(networx_conn)
 
     reference_dir = shared_config.directory_structure["reference_dir"]
     modifier_path = os.path.join(reference_dir, "procedure_modifier_map.txt")
-    modifier_map = load_modifier_map(modifier_path)
-    shared_config.modifier_map = modifier_map
+    shared_config.modifier_map = load_modifier_map(modifier_path)
     context = build_context(shared_config, networx_conn, qnxt_conn)
+    shared_config.locality_fee_schedules = preload_all_locality_fee_schedules(context)
     
     ensure_directories_exist(shared_config)
 

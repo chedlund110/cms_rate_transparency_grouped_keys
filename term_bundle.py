@@ -44,6 +44,7 @@ class TermBundle:
         self.service_mod_pos_list: Optional[Dict[str, Any]] = None
         self.has_services: Optional[bool]
         self.code_group_tree: Optional[dict] = None
+        self.locality_fee_schedule_keys: Optional[tuple[str,str,str]] = None
 
     def _get_decimal(self, term: Dict[str, Any], key: str) -> Decimal:
         raw = term.get(key, "")

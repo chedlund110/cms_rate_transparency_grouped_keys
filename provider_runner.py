@@ -37,7 +37,7 @@ def run_all_providers(shared_config: SharedConfig, rate_group_key_factory: RateG
 
     for row_group in grouped_providers.values():
         bundle = build_provider_bundle_from_rows(row_group)
-        group_keys = context.rate_group_key_factory.get_keys_for_ratesheet(bundle.rate_sheet_code)
+        group_keys = context.rate_group_key_factory.get_keys_for_rate_sheet(bundle.rate_sheet_code)
         process_single_provider(bundle, group_keys, context)
 
     provider_identifier_output_file.flush()

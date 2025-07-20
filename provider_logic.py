@@ -30,8 +30,10 @@ def process_single_provider(
     for group_key, rgk in group_keys.items():
         if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers):
 
-            # ✅ If the rate sheet requires locality match, and none was found, skip
-            if rgk.schedule_type == "CarrierLocFeeSched":
+            # If the rate sheet requires locality match, and none was found, skip
+            rate_sheet_code = group_key.split("#")[0]
+            
+            if "#locality" in group_key:
                 if not getattr(provider_bundle, "locality_key", None):
                     continue  # Skip if no locality match
 
@@ -40,7 +42,6 @@ def process_single_provider(
             write_prov_grp_contract_file(context, provider_bundle, group_key)
 
     return provider_bundle
-
 def group_provider_rows_by_unique_key(provider_rows: list[dict[str, Any]]) -> dict[tuple[str, str], list[dict[str, Any]]]:
     grouped: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
 
@@ -117,7 +118,7 @@ def fetch_providers(context) -> list[dict[str, Any]]:
         contracted = 'Y' AND
         PROV.status = 'Active' AND 
         PA.attributeid = '{TAXONOMY_ATTRIBUTE_ID}' AND
-        programid IN {build_in_clause_from_list(context.program_list)}
+        ctr.programid IN {build_in_clause_from_list(context.program_list)}
     """
     return context.qnxt_conn.execute_query_with_columns(query)
 

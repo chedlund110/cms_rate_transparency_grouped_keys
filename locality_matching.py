@@ -1,7 +1,7 @@
 from context import Context
 from provider_bundle import ProviderBundle
 
-def find_matching_locality(provider_zip: str, carrier_number: str, context: Context) -> tuple[str, str] | None:
+def find_matching_locality(provider_zip: str, context: Context) -> tuple[str, str] | None:
     """
     Find the matching (carrier, locality) tuple for the provider's ZIP code.
     """
@@ -10,9 +10,7 @@ def find_matching_locality(provider_zip: str, carrier_number: str, context: Cont
     except ValueError:
         return None  # Invalid ZIP
 
-    for carrier, locality, begin_zip, end_zip in context.locality_zip_ranges:
-        if carrier != carrier_number:
-            continue
+    for carrier, locality, begin_zip, end_zip in context.shared_config.locality_zip_ranges:
         try:
             if int(begin_zip) <= zip_int <= int(end_zip):
                 return (carrier, locality)
@@ -25,13 +23,12 @@ def attach_provider_locality_info(bundle: ProviderBundle, context: Context) -> N
     """
     Attach the matching locality info (carrier, locality) to the provider bundle, if found.
     """
-    zip_code = getattr(bundle, "zip_code", None)
-    carrier_number = getattr(bundle, "carrier_number", None)
+    zip_code = getattr(bundle, "zip", None)
 
-    if not zip_code or not carrier_number:
+    if not zip_code:
         return  # Required info missing
 
-    result = find_matching_locality(zip_code, carrier_number, context)
+    result = find_matching_locality(zip_code, context)
 
     if result:
         bundle.locality_key = result  # You can choose your attribute name here

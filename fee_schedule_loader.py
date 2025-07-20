@@ -14,40 +14,6 @@ def fetch_schedule_metadata(context: Context, schedule_name: str) -> dict[str, A
     rows = context.networx_conn.execute_query_with_columns(query)
     return rows[0] if rows else {}
 
-def fetch_all_locality_info(context: Context) -> None:
-    if context.locality_zip_ranges is not None:
-        return  # Already loaded
-
-    query = """
-        SELECT LOCALITYNUMBER, CARRIERNUMBER, BEGINZIP, ENDZIP
-        FROM RBRVSZIP
-        WHERE GETDATE() BETWEEN EFFECTIVEDATE AND TERMINATIONDATE
-    """
-    rows = context.networx_conn.execute_query_with_columns(query)
-
-    context.locality_zip_ranges = [
-        (
-            row["CARRIERNUMBER"],
-            row["LOCALITYNUMBER"],
-            row["BEGINZIP"],
-            row["ENDZIP"]
-        )
-        for row in rows
-    ]
-
-def fetch_locality_fee_schedule(
-    context: Context, schedule_name: str, locality_number: str, carrier_number: str
-) -> list[dict[str, Any]]:
-    query = f"""
-        SELECT *
-        FROM STATELOCALITYSCHEDULEVALUES
-        WHERE TABLENAME = '{schedule_name}'
-        AND LOCALITYNUMBER = '{locality_number}'
-        AND CARRIERNUMBER = '{carrier_number}'
-        AND GETDATE() BETWEEN EFFECTIVEDATE AND TERMINATIONDATE
-    """
-    return context.networx_conn.execute_query_with_columns(query)
-
 def fetch_default_fee_schedule(context: Context, schedule_name: str) -> list[dict[str, Any]]:
     query = f"""
         SELECT *
@@ -56,6 +22,36 @@ def fetch_default_fee_schedule(context: Context, schedule_name: str) -> list[dic
         AND GETDATE() BETWEEN EFFECTIVEDATE AND TERMINATIONDATE
     """
     return context.networx_conn.execute_query_with_columns(query)
+
+# --- Preloading logic for locality-based schedules ---
+def preload_all_locality_fee_schedules(context: Context) -> dict:
+    """
+    Loads all rows from STATELOCALITYSCHEDULEVALUES into memory once,
+    grouped by (TABLENAME, CARRIERNUMBER, LOCALITYNUMBER).
+    """
+    query = """
+        SELECT *
+        FROM STATELOCALITYSCHEDULEVALUES
+        WHERE GETDATE() BETWEEN EFFECTIVEDATE AND TERMINATIONDATE
+    """
+    all_rows = context.networx_conn.execute_query_with_columns(query)
+
+    locality_fee_schedules = {}
+
+    for row in all_rows:
+        schedule_name = row["TABLENAME"]
+        carrier = row["CARRIERNUMBER"]
+        locality = row["LOCALITYNUMBER"]
+        key = (schedule_name, carrier, locality)
+
+        parsed = process_fee_schedule_rows(context, schedule_name, [row])
+        if key not in locality_fee_schedules:
+            locality_fee_schedules[key] = {}
+
+        for mod, procs in parsed.items():
+            locality_fee_schedules[key].setdefault(mod, {}).update(procs)
+
+    return locality_fee_schedules
 
 def process_fee_schedule_rows(
     context: Context, fee_schedule_name: str, rows: list[dict[str, Any]]
@@ -87,37 +83,34 @@ def process_fee_schedule_rows(
 
     return fee_schedule
 
-# --- Main entry point ---
-def load_fee_schedule(context: Context, schedule_name: str) -> None:
-    # Standard schedules still use the top-level context.fee_schedules
+def load_fee_schedule(context: Context, schedule_name: str) -> list[tuple[str, str, str]]:
     if schedule_name in context.fee_schedules:
-        return
+        return []
+
+    if not hasattr(context.shared_config, "locality_fee_schedules"):
+        context.shared_config.locality_fee_schedules = {}
+
+    if not hasattr(context.shared_config, "fee_schedule_types"):
+        context.shared_config.fee_schedule_types = {}
+
+    locality_keys = []
 
     metadata = fetch_schedule_metadata(context, schedule_name)
     schedule_type = metadata.get("SCHEDULETYPE", "")
     zip_source_type = metadata.get("ZIPSOURCETYPE", "")
+    context.shared_config.fee_schedule_types[schedule_name] = schedule_type
 
-    if schedule_type == "CarrierLocFeeSched":
-        fetch_all_locality_info(context)
+    seen_keys = set()
+    for carrier, locality, *_ in context.shared_config.locality_zip_ranges:
+        key = (schedule_name, str(carrier), str(locality))
+        if key in context.shared_config.locality_fee_schedules and key not in seen_keys:
+            seen_keys.add(key)
+            locality_keys.append(key)
 
-        # Make sure storage exists
-        if not hasattr(context, "locality_fee_schedules"):
-            context.locality_fee_schedules = {}
-
-        for carrier, locality, *_ in context.locality_zip_ranges:
-            key = (schedule_name, carrier, locality)
-
-            if key in context.locality_fee_schedules:
-                continue  # Already loaded
-
-            sched_rows = fetch_locality_fee_schedule(context, schedule_name, locality, carrier)
-            parsed_rows = process_fee_schedule_rows(context, schedule_name, sched_rows)
-
-            context.locality_fee_schedules[key] = parsed_rows
-
-        # Still mark this fee schedule as handled globally
-        context.fee_schedules[schedule_name] = {}
+            context.fee_schedules[schedule_name] = {}
 
     else:
         rows = fetch_default_fee_schedule(context, schedule_name)
         context.fee_schedules[schedule_name] = process_fee_schedule_rows(context, schedule_name, rows)
+
+    return locality_keys
