@@ -105,6 +105,20 @@ def get_service_code_type(proc_code: str) -> str:
         proc_code_type = "RC"
     return proc_code_type
 
+def normalize_code_type(code_type: str) -> str:
+    mapping = {
+        "CodeTypeNDCCodeLine": "NDC",
+        "CodeTypeCPT4Procedure": "CPT",
+        "CodeTypeRevenue": "RC",
+        "CodeTypeDRG": "DRG",
+        "CodeTypeHCPC": "HCPCS",
+        "CodeTypeProcedureWithModifier": "CPT",  # Or whatever final code you'd use
+        "CodeTypeCPT4": "CPT",
+        "CodeTypeCPT4CodeExists": "CPT",
+        # Add others as needed
+    }
+    return mapping.get(code_type, code_type)
+
 def update_prov_grp_contract_keys(provider_bundle: ProviderBundle, rate_key: str = '') -> bool:
     # Create the xref_key as a tuple of (program_id, rate_key)
     xref_key = (provider_bundle.program_id, rate_key)

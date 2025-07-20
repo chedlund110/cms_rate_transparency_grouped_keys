@@ -1,5 +1,6 @@
 import csv
 import datetime
+from collections import defaultdict
 
 def parse_date_flexible(date_str: str) -> datetime.date | None:
     """
@@ -13,8 +14,10 @@ def parse_date_flexible(date_str: str) -> datetime.date | None:
             continue
     return None
 
-def load_modifier_map(file_path: str) -> set[tuple[str, str]]:
-    active_modifiers = set()
+def load_modifier_map(file_path: str) -> dict[str, set[str]]:
+    # simple function to read in the csv
+    # and populate the service / modifier map
+    modifiers_to_codes = defaultdict(set)
     today = datetime.date.today()
 
     with open(file_path, "r", encoding="utf-8") as csvfile:
@@ -32,7 +35,7 @@ def load_modifier_map(file_path: str) -> set[tuple[str, str]]:
                 if exp_date < today:
                     continue  # Expired
 
-            active_modifiers.add((code, modifier))
+            modifiers_to_codes[modifier].add(code)
 
-    return active_modifiers
+    return dict(modifiers_to_codes)
 

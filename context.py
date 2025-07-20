@@ -45,3 +45,5 @@ class Context:
         self.shared_config = shared_config
         self.statistics = StatisticsTracker()
         self.codegroup_trees: dict[int, dict] = {}
+        self.locality_info_rows = None
+        self.locality_zip_ranges = None

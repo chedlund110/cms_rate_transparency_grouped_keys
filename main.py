@@ -163,6 +163,7 @@ def main():
     reference_dir = shared_config.directory_structure["reference_dir"]
     modifier_path = os.path.join(reference_dir, "procedure_modifier_map.txt")
     modifier_map = load_modifier_map(modifier_path)
+    shared_config.modifier_map = modifier_map
     context = build_context(shared_config, networx_conn, qnxt_conn)
     
     ensure_directories_exist(shared_config)
@@ -179,10 +180,10 @@ def main():
     process_plan_details(context, base_params)
     
     # standalone rate runner
-    #rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
+    rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn)
     
     # parallel process runner
-    rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
+    # rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
 
     run_all_providers(shared_config, rate_group_key_factory)
 

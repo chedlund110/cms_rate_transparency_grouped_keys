@@ -31,7 +31,7 @@ def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict
         fee = base_rate
         fee_type = "negotiated"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             pos = '21' if rate_type_desc == 'institutional' else '11'
 
@@ -41,7 +41,7 @@ def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -55,7 +55,7 @@ def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -75,7 +75,7 @@ def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cach
     fee = base_pct_of_charge * 100 if base_pct_of_charge > 0 else base_rate
     fee_type = "percentage" if base_pct_of_charge > 0 else "negotiated"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             pos = '21' if rate_type_desc == 'institutional' else '11'
 
@@ -85,7 +85,7 @@ def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cach
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -99,7 +99,7 @@ def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cach
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -119,7 +119,7 @@ def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_
     fee = base_pct_of_charge * 100 if base_pct_of_charge > 0 else base_rate
     fee_type = "percentage" if base_pct_of_charge > 0 else "negotiated"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             pos = '21' if rate_type_desc == 'institutional' else '11'
 
@@ -129,7 +129,7 @@ def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -143,7 +143,7 @@ def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -163,7 +163,7 @@ def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, 
     fee = base_pct_of_charge * 100 if base_pct_of_charge > 0 else base_rate
     fee_type = "percentage" if base_pct_of_charge > 0 else "negotiated"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             pos = '21' if rate_type_desc == 'institutional' else '11'
 
@@ -173,7 +173,7 @@ def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, 
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -187,7 +187,7 @@ def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, 
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -206,7 +206,7 @@ def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate
     fee = base_pct_of_charge * 100
     fee_type = "percentage"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             pos = '21' if rate_type_desc == 'institutional' else '11'
 
@@ -216,7 +216,7 @@ def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -230,7 +230,7 @@ def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
@@ -262,7 +262,7 @@ def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rat
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(ndc_code),
+            "billing_code_type": "NDC",
             "billing_code_type_ver": "10",
             "billing_code": ndc_code,
             "pos_collection_key": pos,
@@ -276,7 +276,7 @@ def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rat
         })
 
         code_tuple = (ndc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, ndc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, ndc_code, modifier, pos, "NDC")
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_optum_physician_pricer(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:

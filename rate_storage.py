@@ -16,7 +16,13 @@ def store_rate_record(
     Also updates the group key with the procedure code used.
     """
     proc_code, modifier, pos = code_tuple
-    valid_code_key: str = (proc_code, rate_dict["billing_code_type"])
+    billing_code_type = rate_dict["billing_code_type"]
+    if billing_code_type == 'RC':
+        temp_proc_code = proc_code.zfill(4)
+    else:
+        temp_proc_code = proc_code
+
+    valid_code_key: str = (temp_proc_code, billing_code_type)
     if valid_code_key not in valid_service_codes:
         return
     

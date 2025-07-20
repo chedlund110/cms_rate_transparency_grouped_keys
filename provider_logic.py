@@ -2,20 +2,9 @@ from typing import Any
 from constants import TAXONOMY_ATTRIBUTE_ID
 from context import Context
 from collections import defaultdict
+from locality_matching import attach_provider_locality_info
 from provider_bundle import ProviderBundle
 from utilities import build_in_clause_from_list, update_prov_grp_contract_keys
-from ratesheet_loader import load_ratesheet_by_code
-from section_handlers import (
-    process_outpatient_services,
-    process_outpatient_case_rate,
-    process_outpatient_per_diem,
-    process_outpatient_exclusions,
-    process_inpatient_services,
-    process_inpatient_case_rate,
-    process_inpatient_per_diem,
-    process_inpatient_exclusions
-)
-
 from provider_bundle import ProviderBundle
 from rate_group_key_factory import RateGroupKeyFactory, RateGroupKey
 from context import Context
@@ -34,12 +23,19 @@ def process_single_provider(
         group_keys: dict[str, RateGroupKey],
         context: Context
     ) -> None:
-    
+
+    # 🔁 Attach (carrier, locality) match based on provider ZIP + carrier_number
+    attach_provider_locality_info(provider_bundle, context)
+
     for group_key, rgk in group_keys.items():
         if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers):
-            # 💡 Add this line to populate the contract key structure
-            update_prov_grp_contract_keys(provider_bundle, group_key)
 
+            # ✅ If the rate sheet requires locality match, and none was found, skip
+            if rgk.schedule_type == "CarrierLocFeeSched":
+                if not getattr(provider_bundle, "locality_key", None):
+                    continue  # Skip if no locality match
+
+            update_prov_grp_contract_keys(provider_bundle, group_key)
             write_provider_identifiers_record(context, provider_bundle, group_key)
             write_prov_grp_contract_file(context, provider_bundle, group_key)
 

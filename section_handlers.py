@@ -53,7 +53,7 @@ def process_inpatient_exclusions(context: Context, inpatient_exclusions: list[di
             process_term(context, term_bundle, rate_cache, rate_group_key_factory)
 
 def process_outpatient_case_rate(context: Context, outpatient_case_rate: list[dict], rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    rate_type_desc = 'institutional'
+    rate_type_desc = 'professional'
     for term in outpatient_case_rate:
         subterms = term.get("subterms",{})
         if subterms:
@@ -65,36 +65,36 @@ def process_outpatient_case_rate(context: Context, outpatient_case_rate: list[di
             process_term(context, term_bundle, rate_cache, rate_group_key_factory)
     
 def process_outpatient_per_diem(context: Context, outpatient_per_diem: list[dict], rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    rate_type = 'non_fac'
+    rate_type_desc = 'professional'
     for term in outpatient_per_diem:
         subterms = term.get("subterms",{})
         if subterms:
             for subterm in subterms:
-                term_bundle = TermBundle(subterm)
+                term_bundle = TermBundle(subterm, rate_type_desc=rate_type_desc)
                 process_term(context, term_bundle, rate_cache, rate_group_key_factory)
         else:
             term_bundle = TermBundle(term)
             process_term(context, term_bundle, rate_cache, rate_group_key_factory)
 
 def process_outpatient_services(context: Context, outpatient_services: list[dict], rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    rate_type = 'non_fac'
+    rate_type_desc = 'professional'
     for term in outpatient_services:
         subterms = term.get("subterms",{})
         if subterms:
             for subterm in subterms:
-                term_bundle = TermBundle(subterm)
+                term_bundle = TermBundle(subterm, rate_type_desc=rate_type_desc)
                 process_term(context, term_bundle, rate_cache, rate_group_key_factory)
         else:
             term_bundle = TermBundle(term)
             process_term(context, term_bundle, rate_cache, rate_group_key_factory)
 
 def process_outpatient_exclusions(context: Context, outpatient_exclusions: list[dict], rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    rate_type = 'non_fac'
+    rate_type_desc = 'professional'
     for term in outpatient_exclusions:
         subterms = term.get("subterms",{})
         if subterms:
             for subterm in subterms:
-                term_bundle = TermBundle(subterm)
+                term_bundle = TermBundle(subterm, rate_type_desc=rate_type_desc)
                 process_term(context, term_bundle, rate_cache, rate_group_key_factory)
         else:
             term_bundle = TermBundle(term)

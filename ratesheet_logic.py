@@ -9,8 +9,10 @@ def fetch_ratesheets(context) -> list[dict]:
     SELECT * 
     FROM STDRATESHEETS
     WHERE
+        RATESHEETCODE = 'AVCRPRF00221' AND 
         RATESHEETCODE IS NOT NULL AND 
         RATESHEETCODE LIKE 'AV%' AND 
+        RATESHEETCODE NOT LIKE 'AVGB%' AND 
         RATESHEETCODE not like 'Z%' AND  
         RATESHEETCODE not like '%-%'
     """

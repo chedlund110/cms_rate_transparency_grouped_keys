@@ -32,7 +32,7 @@ def run_all_providers(shared_config: SharedConfig, rate_group_key_factory: RateG
 
     grouped_providers = defaultdict(list)
     for row in provider_rows:
-        key = (row["provid"], row["NxRateSheetId"])
+        key = (row["provid"].strip(), row["NxRateSheetId"].strip())
         grouped_providers[key].append(row)
 
     for row_group in grouped_providers.values():

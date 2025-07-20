@@ -9,8 +9,8 @@ def build_group_keys_for_term(term_bundle: TermBundle, factory: RateGroupKeyFact
     qualified_codes: set[tuple[str, str, str]] = set()
     has_qualifiers = bool(term_bundle.provider_code_ranges)
 
-    for proc_code, modifier, pos in term_bundle.service_mod_pos_list:
-        key = (proc_code, modifier, pos)
+    for proc_code, modifier, pos, code_type in term_bundle.service_mod_pos_list:
+        key = (proc_code, modifier, pos, code_type)
         all_codes.add(key)
         if has_qualifiers:
             qualified_codes.add(key)

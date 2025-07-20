@@ -16,5 +16,5 @@ class DRGCodeExtract:
             line = '|'.join([code_id,"DRG","10",str(row.get("description", "")).strip(),""]) + '\n'
             self.output_file.write(line)
             rec_cnt += 1
-            valid_service_codes.add((row.get("codeid",""),"DRG"))
+            valid_service_codes.add((code_id, "DRG"))
         return rec_cnt, valid_service_codes

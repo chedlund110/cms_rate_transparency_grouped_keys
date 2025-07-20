@@ -31,11 +31,10 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_c
         fee = term_bundle.base_rate1
         fee_type = 'negotiated'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
         allow_amt = 0
 
@@ -45,7 +44,7 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_c
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -58,7 +57,7 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_c
             "calc_bean": calc_bean
         })
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -82,11 +81,10 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate
         fee = term_bundle.base_rate1
         fee_type = 'negotiated'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -95,7 +93,7 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -109,7 +107,7 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -129,11 +127,10 @@ def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, ra
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -142,7 +139,7 @@ def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, ra
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type":code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -156,7 +153,7 @@ def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, ra
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -176,11 +173,10 @@ def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle,
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -189,7 +185,7 @@ def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle,
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -203,7 +199,7 @@ def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle,
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -223,11 +219,10 @@ def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -236,7 +231,7 @@ def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -250,7 +245,7 @@ def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -270,11 +265,10 @@ def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_ca
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -283,7 +277,7 @@ def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_ca
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -297,7 +291,7 @@ def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_ca
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 
@@ -318,11 +312,10 @@ def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle, rate
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -331,7 +324,7 @@ def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle, rate
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -345,7 +338,7 @@ def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle, rate
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -365,11 +358,10 @@ def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle
     fee = base_pct_of_charge * 100
     fee_type = 'percentage'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -378,7 +370,7 @@ def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -392,7 +384,7 @@ def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -412,11 +404,10 @@ def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_ca
     fee = base_pct_of_charge * 100
     fee_type = 'percentage'
 
-    for proc_code, modifier, pos in ranges:
+    for proc_code, modifier, pos, code_type in ranges:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
-        proc_code_type = get_service_code_type(proc_code)
         term_date = "99991231"
 
         rate_dict = rate_template.copy()
@@ -425,7 +416,7 @@ def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_ca
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": proc_code_type,
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -439,5 +430,5 @@ def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_ca
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)

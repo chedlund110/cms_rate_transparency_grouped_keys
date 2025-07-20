@@ -26,7 +26,7 @@ def process_per_diem(context: Context, term_bundle: TermBundle, rate_cache: dict
         fee = base_rate
         fee_type = "per diem"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -37,7 +37,7 @@ def process_per_diem(context: Context, term_bundle: TermBundle, rate_cache: dict
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -51,7 +51,7 @@ def process_per_diem(context: Context, term_bundle: TermBundle, rate_cache: dict
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 
@@ -75,7 +75,7 @@ def process_pd_with_max(context: Context, term_bundle: TermBundle, rate_cache: d
         fee = base_rate
         fee_type = "per diem"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -86,7 +86,7 @@ def process_pd_with_max(context: Context, term_bundle: TermBundle, rate_cache: d
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -100,7 +100,7 @@ def process_pd_with_max(context: Context, term_bundle: TermBundle, rate_cache: d
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 
@@ -123,7 +123,7 @@ def process_three_lev_pd(context: Context, term_bundle: TermBundle, rate_cache: 
         fee = max(x for x in [term_bundle.base_rate, term_bundle.per_diem, term_bundle.outlier] if x is not None)
         fee_type = "per diem"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -134,7 +134,7 @@ def process_three_lev_pd(context: Context, term_bundle: TermBundle, rate_cache: 
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -148,7 +148,7 @@ def process_three_lev_pd(context: Context, term_bundle: TermBundle, rate_cache: 
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 
@@ -171,7 +171,7 @@ def process_pd_five_lv_confine_day(context: Context, term_bundle: TermBundle, ra
         fee = max(x for x in [term_bundle.base_rate, term_bundle.base_rate1, term_bundle.base_rate2, term_bundle.per_diem, term_bundle.outlier] if x is not None)
         fee_type = "per diem"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -182,7 +182,7 @@ def process_pd_five_lv_confine_day(context: Context, term_bundle: TermBundle, ra
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -196,7 +196,7 @@ def process_pd_five_lv_confine_day(context: Context, term_bundle: TermBundle, ra
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
 
 
@@ -220,7 +220,7 @@ def process_pd_with_alos(context: Context, term_bundle: TermBundle, rate_cache: 
         fee = base_rate
         fee_type = "per diem"
 
-    for proc_code, modifier, pos in service_mod_pos_list:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -231,7 +231,7 @@ def process_pd_with_alos(context: Context, term_bundle: TermBundle, rate_cache: 
             "insurer_code": context.insurer_code,
             "prov_grp_contract_key": rate_key,
             "negotiation_arrangement": "ffs",
-            "billing_code_type": get_service_code_type(proc_code),
+            "billing_code_type": code_type,
             "billing_code_type_ver": "10",
             "billing_code": proc_code,
             "pos_collection_key": pos,
@@ -245,5 +245,5 @@ def process_pd_with_alos(context: Context, term_bundle: TermBundle, rate_cache: 
         })
 
         code_tuple = (proc_code, modifier, pos)
-        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos)
+        dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
         store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)

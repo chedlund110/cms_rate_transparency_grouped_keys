@@ -36,8 +36,8 @@ def process_ratesheet_worker(
 
         ratesheet = load_ratesheet_by_code(context, rate_sheet_code)
         
-        process_inpatient_per_diem(context, ratesheet.get("inpatient per diem", []), rate_cache, rate_group_key_factory)
         process_inpatient_case_rate(context, ratesheet.get("inpatient case rate", []), rate_cache, rate_group_key_factory)
+        process_inpatient_per_diem(context, ratesheet.get("inpatient per diem", []), rate_cache, rate_group_key_factory)
         process_inpatient_services(context, ratesheet.get("inpatient services", []), rate_cache, rate_group_key_factory)
         process_inpatient_exclusions(context, ratesheet.get("inpatient exclusions", []), rate_cache, rate_group_key_factory)
         

@@ -14,16 +14,30 @@ def fetch_schedule_metadata(context: Context, schedule_name: str) -> dict[str, A
     rows = context.networx_conn.execute_query_with_columns(query)
     return rows[0] if rows else {}
 
-def fetch_locality_info(context: Context, zip_code: str, zip_source_type: str) -> dict[str, Any]:
-    query = f"""
-        SELECT LOCALITYNUMBER, CARRIERNUMBER
+def fetch_all_locality_info(context: Context) -> None:
+    if context.locality_zip_ranges is not None:
+        return  # Already loaded
+
+    query = """
+        SELECT LOCALITYNUMBER, CARRIERNUMBER, BEGINZIP, ENDZIP
         FROM RBRVSZIP
-        WHERE BEGINZIP = '{zip_code}' AND SOURCETYPE = '{zip_source_type}'
+        WHERE GETDATE() BETWEEN EFFECTIVEDATE AND TERMINATIONDATE
     """
     rows = context.networx_conn.execute_query_with_columns(query)
-    return rows[0] if rows else {}
 
-def fetch_locality_fee_schedule(context: Context, schedule_name: str, locality_number: str, carrier_number: str) -> list[dict[str, Any]]:
+    context.locality_zip_ranges = [
+        (
+            row["CARRIERNUMBER"],
+            row["LOCALITYNUMBER"],
+            row["BEGINZIP"],
+            row["ENDZIP"]
+        )
+        for row in rows
+    ]
+
+def fetch_locality_fee_schedule(
+    context: Context, schedule_name: str, locality_number: str, carrier_number: str
+) -> list[dict[str, Any]]:
     query = f"""
         SELECT *
         FROM STATELOCALITYSCHEDULEVALUES
@@ -43,8 +57,9 @@ def fetch_default_fee_schedule(context: Context, schedule_name: str) -> list[dic
     """
     return context.networx_conn.execute_query_with_columns(query)
 
-# --- Shared row parser ---
-def process_fee_schedule_rows(context: Context, fee_schedule_name: str, rows: list[dict[str, Any]]) -> dict:
+def process_fee_schedule_rows(
+    context: Context, fee_schedule_name: str, rows: list[dict[str, Any]]
+) -> dict:
     fee_schedule = {}
     for row in rows:
         proc_code = row.get("PROCEDURECODE", "")
@@ -74,7 +89,7 @@ def process_fee_schedule_rows(context: Context, fee_schedule_name: str, rows: li
 
 # --- Main entry point ---
 def load_fee_schedule(context: Context, schedule_name: str) -> None:
-    
+    # Standard schedules still use the top-level context.fee_schedules
     if schedule_name in context.fee_schedules:
         return
 
@@ -83,17 +98,26 @@ def load_fee_schedule(context: Context, schedule_name: str) -> None:
     zip_source_type = metadata.get("ZIPSOURCETYPE", "")
 
     if schedule_type == "CarrierLocFeeSched":
-        locality_info = fetch_locality_info(context, '00000', zip_source_type)
-        if locality_info:
-            rows = fetch_locality_fee_schedule(
-                context,
-                schedule_name,
-                locality_info["LOCALITYNUMBER"],
-                locality_info["CARRIERNUMBER"]
-            )
-            context.fee_schedules[schedule_name] = process_fee_schedule_rows(context, schedule_name, rows)
-        else:
-            context.fee_schedules[schedule_name] = {}
+        fetch_all_locality_info(context)
+
+        # Make sure storage exists
+        if not hasattr(context, "locality_fee_schedules"):
+            context.locality_fee_schedules = {}
+
+        for carrier, locality, *_ in context.locality_zip_ranges:
+            key = (schedule_name, carrier, locality)
+
+            if key in context.locality_fee_schedules:
+                continue  # Already loaded
+
+            sched_rows = fetch_locality_fee_schedule(context, schedule_name, locality, carrier)
+            parsed_rows = process_fee_schedule_rows(context, schedule_name, sched_rows)
+
+            context.locality_fee_schedules[key] = parsed_rows
+
+        # Still mark this fee schedule as handled globally
+        context.fee_schedules[schedule_name] = {}
+
     else:
         rows = fetch_default_fee_schedule(context, schedule_name)
         context.fee_schedules[schedule_name] = process_fee_schedule_rows(context, schedule_name, rows)
