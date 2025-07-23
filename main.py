@@ -177,9 +177,9 @@ def main():
     # parallel process runner
     # rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
 
-    run_all_providers(shared_config, rate_group_key_factory)
+    #run_all_providers(shared_config, rate_group_key_factory)
 
-    merge_all_outputs(shared_config)
+    #merge_all_outputs(shared_config)
     
 if __name__ == "__main__":
     profiler = cProfile.Profile()

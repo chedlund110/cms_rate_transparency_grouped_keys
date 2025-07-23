@@ -2,7 +2,7 @@ from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from provider_bundle import ProviderBundle
 from rate_group_key_factory import RateGroupKeyFactory
-from rate_storage import build_partial_indexes, store_rate_record
+from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_pos_and_type
 from decimal import Decimal, ROUND_HALF_UP

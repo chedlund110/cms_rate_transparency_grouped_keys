@@ -1,6 +1,7 @@
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_service_code_type
@@ -8,10 +9,14 @@ from utilities import get_service_code_type
 
 def process_per_diem(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_diem"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_diem"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
+
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -57,10 +62,13 @@ def process_per_diem(context: Context, term_bundle: TermBundle, rate_cache: dict
 
 def process_pd_with_max(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_diem"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_diem"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -106,10 +114,13 @@ def process_pd_with_max(context: Context, term_bundle: TermBundle, rate_cache: d
 
 def process_three_lev_pd(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_diem"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_diem"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -154,10 +165,13 @@ def process_three_lev_pd(context: Context, term_bundle: TermBundle, rate_cache: 
 
 def process_pd_five_lv_confine_day(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_diem"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_diem"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
@@ -202,10 +216,13 @@ def process_pd_five_lv_confine_day(context: Context, term_bundle: TermBundle, ra
 
 def process_pd_with_alos(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_diem"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_diem"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc

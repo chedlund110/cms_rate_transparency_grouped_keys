@@ -6,16 +6,20 @@ from calculations.fee_schedule import process_fee_schedule
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_service_code_type
 
 def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_item"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_item"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -60,10 +64,13 @@ def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict
 
 def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_unit"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_unit"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -104,10 +111,13 @@ def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cach
 
 def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_unit"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_item"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -148,10 +158,13 @@ def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_
 
 def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_item"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_item"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -192,10 +205,13 @@ def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, 
 
 def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#per_item"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#per_item"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -235,10 +251,13 @@ def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate
 
 def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
-    rate_key = f"{term_bundle.rate_sheet_code}#ndc"
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#ndc"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id

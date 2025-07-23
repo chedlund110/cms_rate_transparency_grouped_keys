@@ -3,6 +3,7 @@ from constants import DEFAULT_EXP_DATE, rate_template
 from provider_bundle import ProviderBundle
 from rate_storage import store_rate_record
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from term_bundle import TermBundle
 from file_writer import write_provider_identifiers_record
 from utilities import get_service_code_type, update_prov_grp_contract_keys
@@ -10,7 +11,7 @@ from utilities import get_service_code_type, update_prov_grp_contract_keys
 def process_drg_weighting(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     
     rate_key = f"{term_bundle.rate_sheet_code}#drg"
-
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     # Static values from term
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -51,6 +52,7 @@ def process_drg_weighting(context: Context, term_bundle: TermBundle, rate_cache:
 def process_drg_weighting_day_outlier(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     
     rate_key = f"{term_bundle.rate_sheet_code}#drg"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     # Static values from term
     calc_bean = term_bundle.calc_bean

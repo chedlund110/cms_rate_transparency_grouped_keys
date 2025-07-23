@@ -28,35 +28,25 @@ def store_rate_record(
     
     rate_cache[dict_key] = rate_dict
 
-def build_partial_indexes(provider_rates_temp: dict) -> dict[str, dict]:
+def build_rate_cache_index(rate_cache: dict) -> dict:
     """
-    Builds partial key indexes for fast lookup of allowed amounts.
-    Returns a dictionary with 4 sub-indexes:
-      - proc_mod_pos: (proc_code, modifier, pos)
-      - proc_mod:     (proc_code, modifier)
-      - proc_pos:     (proc_code, pos)
-      - proc_only:    proc_code
+    Builds an index from rate_cache keyed by:
+    rate_sheet_code -> proc_code -> list of full keys in rate_cache.
+
+    This supports fast lookup of all modifier/POS variations for a given proc_code
+    within a specific rate sheet context.
     """
-    indexes = {
-        "proc_mod_pos": {},
-        "proc_mod": {},
-        "proc_pos": {},
-        "proc_only": {}
-    }
+    index = {}
 
-    for key in provider_rates_temp:
-        _, proc, mod, pos = key  # Ignore first element (fee_schedule or rate_sheet)
+    for full_key in rate_cache:
+        # full_key: (rate_sheet_code, proc_code, modifier, pos, code_type)
+        rate_sheet_code, proc_code, _, _, _ = full_key
 
-        # (proc, mod, pos)
-        indexes["proc_mod_pos"].setdefault((proc, mod, pos), []).append(key)
+        if rate_sheet_code not in index:
+            index[rate_sheet_code] = {}
+        if proc_code not in index[rate_sheet_code]:
+            index[rate_sheet_code][proc_code] = []
 
-        # (proc, mod)
-        indexes["proc_mod"].setdefault((proc, mod), []).append(key)
+        index[rate_sheet_code][proc_code].append(full_key)
 
-        # (proc, pos)
-        indexes["proc_pos"].setdefault((proc, pos), []).append(key)
-
-        # (proc,)
-        indexes["proc_only"].setdefault(proc, []).append(key)
-
-    return indexes
+    return index

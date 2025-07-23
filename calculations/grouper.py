@@ -1,6 +1,7 @@
 from constants import GROUPER_COLUMN_MAP, rate_template
 from context import Context
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 
@@ -13,6 +14,7 @@ def calc_asc_grouper_9lv_no_disc(context: Context, term_bundle: TermBundle, rate
     base_pct_of_charge = term_bundle.base_pct_of_charge
 
     rate_key = f"{rate_sheet_code}#grouper"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     modifier = ''
     pos = '21'
     proc_code_type = "CPT"
@@ -60,6 +62,7 @@ def calc_asc_grouper_base(context: Context, term_bundle: TermBundle, rate_cache:
     base_pct_of_charge = term_bundle.base_pct_of_charge
 
     rate_key = f"{rate_sheet_code}#grouper"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     modifier = ''
     pos = '21'
     proc_code_type = "CPT"

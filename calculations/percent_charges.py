@@ -2,6 +2,7 @@ from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from provider_bundle import ProviderBundle
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from file_writer import write_provider_identifiers_record
@@ -11,19 +12,20 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_c
     if not term_bundle.base_pct_of_charge:
         return
 
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
+        return
     rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
+    
     fee_schedule_name = term_bundle.fee_schedule_name
     section_id = term_bundle.section_id
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
 
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
-        return
-    
     if base_pct_of_charge:
         fee = base_pct_of_charge * 100
         fee_type = 'percentage'
@@ -31,7 +33,7 @@ def process_percent_of_charges(context: Context, term_bundle: TermBundle, rate_c
         fee = term_bundle.base_rate1
         fee_type = 'negotiated'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -67,12 +69,13 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     if base_pct_of_charge:
         fee = base_pct_of_charge * 100
@@ -81,7 +84,7 @@ def process_pct_of_chrg_flat_amt(context: Context, term_bundle: TermBundle, rate
         fee = term_bundle.base_rate1
         fee_type = 'negotiated'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -117,17 +120,17 @@ def process_percent_of_charges_max(context: Context, term_bundle: TermBundle, ra
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
-
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -163,17 +166,17 @@ def process_percent_of_charges_max_01(context: Context, term_bundle: TermBundle,
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
-
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -209,17 +212,17 @@ def process_pct_chg_pd_max(context: Context, term_bundle: TermBundle, rate_cache
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
-
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -255,17 +258,17 @@ def process_pct_chg_pd_max_01(context: Context, term_bundle: TermBundle, rate_ca
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
-
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -302,17 +305,17 @@ def process_pct_chg_per_proc_max(context: Context, term_bundle: TermBundle, rate
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
-
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     fee = term_bundle.base_rate
     fee_type = 'negotiated'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -348,17 +351,17 @@ def process_pct_chg_per_unit_threshold(context: Context, term_bundle: TermBundle
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
-
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     fee = base_pct_of_charge * 100
     fee_type = 'percentage'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'
@@ -394,17 +397,17 @@ def process_percent_threshold(context: Context, term_bundle: TermBundle, rate_ca
     rate_type_desc = term_bundle.rate_type_desc
     calc_bean = term_bundle.calc_bean
     base_pct_of_charge = term_bundle.base_pct_of_charge
-    ranges = term_bundle.service_mod_pos_list
-
-    rate_key = f"{rate_sheet_code}#pct_chgs"
-
-    if not ranges:
+    service_mod_pos_list = term_bundle.service_mod_pos_list or []
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
-
+    rate_sheet_code = term_bundle.rate_sheet_code
+    rate_key = f"{rate_sheet_code}#pct_chgs"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     fee = base_pct_of_charge * 100
     fee_type = 'percentage'
 
-    for proc_code, modifier, pos, code_type in ranges:
+    for proc_code, modifier, pos, code_type in service_mod_pos_list:
         if pos == '' or pos == '11':
             if rate_type_desc == 'institutional':
                 pos = '21'

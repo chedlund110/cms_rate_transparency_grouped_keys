@@ -14,8 +14,7 @@ from file_writer import write_provider_identifiers_record, write_prov_grp_contra
 def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dict) -> bool:
     return all([
         not qualifiers.get("TAXONOMY") or provider_bundle.taxonomy in qualifiers["TAXONOMY"],
-        not qualifiers.get("ZIP") or provider_bundle.zip in qualifiers["ZIP"],
-        not qualifiers.get("CONTRACT") or provider_bundle.contract_id in qualifiers["CONTRACT"]
+        not qualifiers.get("ZIP") or provider_bundle.zip in qualifiers["ZIP"]
     ])
 
 def process_single_provider(
@@ -24,7 +23,7 @@ def process_single_provider(
         context: Context
     ) -> None:
 
-    # 🔁 Attach (carrier, locality) match based on provider ZIP + carrier_number
+    # Attach (carrier, locality) match based on provider ZIP + carrier_number
     attach_provider_locality_info(provider_bundle, context)
 
     for group_key, rgk in group_keys.items():
@@ -42,6 +41,7 @@ def process_single_provider(
             write_prov_grp_contract_file(context, provider_bundle, group_key)
 
     return provider_bundle
+
 def group_provider_rows_by_unique_key(provider_rows: list[dict[str, Any]]) -> dict[tuple[str, str], list[dict[str, Any]]]:
     grouped: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
 

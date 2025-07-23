@@ -1,7 +1,8 @@
 # ratesheet_logic.py
 
 def fetch_ratesheets(context) -> list[dict]:
-    # Your SQL or logic to pull rate sheet–driven data
+    # pull rate sheet–driven data
+    # RATESHEETCODE = 'AVCRPRF00221' AND 
     query: str = f"""
     SELECT * 
     FROM STDRATESHEETS

@@ -1,17 +1,20 @@
 from context import Context
 from constants import DEFAULT_EXP_DATE, rate_template
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_service_code_type
 
 def process_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_sheet_code = term_bundle.rate_sheet_code
     rate_key = f"{rate_sheet_code}#limit"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -54,11 +57,13 @@ def process_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, r
 
 def process_limit_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_sheet_code = term_bundle.rate_sheet_code
     rate_key = f"{rate_sheet_code}#limit_allowed"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -107,11 +112,13 @@ def process_limit_allowed(context: Context, term_bundle: TermBundle, rate_cache:
 
 def process_limit_allowed_percent(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_sheet_code = term_bundle.rate_sheet_code
     rate_key = f"{rate_sheet_code}#limit_allowed_pct"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -160,11 +167,13 @@ def process_limit_allowed_percent(context: Context, term_bundle: TermBundle, rat
 
 def process_limit_allowed_same_dos(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_sheet_code = term_bundle.rate_sheet_code
     rate_key = f"{rate_sheet_code}#limit_allowed_same_dos"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id

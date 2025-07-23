@@ -3,6 +3,7 @@ from constants import DEFAULT_EXP_DATE, rate_template
 from provider_bundle import ProviderBundle
 from rate_storage import store_rate_record
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from term_bundle import TermBundle
 from file_writer import write_provider_identifiers_record
 from utilities import get_service_code_type, update_prov_grp_contract_keys
@@ -10,11 +11,13 @@ from utilities import get_service_code_type, update_prov_grp_contract_keys
 def process_case_rate(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges or {}
+
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
-
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     # Static values from term
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -60,11 +63,13 @@ def process_case_rate(context: Context, term_bundle: TermBundle, rate_cache: dic
 def process_case_rate_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges or {}
+
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
-
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     # Static values from term
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -110,11 +115,13 @@ def process_case_rate_limit(context: Context, term_bundle: TermBundle, rate_cach
 def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges or {}
+
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
-
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
     # Static values from term
     calc_bean = term_bundle.calc_bean
     section_id = term_bundle.section_id
@@ -155,10 +162,13 @@ def process_cr_ltd_by_pct_of_chg(context: Context, term_bundle: TermBundle, rate
 
 def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges or {}
+
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     # Static values from term
     calc_bean = term_bundle.calc_bean
@@ -205,10 +215,13 @@ def process_case_rate_two_lev_per_diem_limit(context: Context, term_bundle: Term
 
 def process_case_rate_three_lev_per_diem_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
-    if not service_mod_pos_list:
+    provider_ranges = term_bundle.provider_ranges or {}
+
+    if not service_mod_pos_list and not provider_ranges:
         return
 
     rate_key = f"{term_bundle.rate_sheet_code}#case_rate"
+    rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
 
     # Static values from term
     calc_bean = term_bundle.calc_bean
