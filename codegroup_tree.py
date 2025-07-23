@@ -5,6 +5,25 @@ from collections import defaultdict
 from itertools import product
 import re
 
+def extract_provider_ranges_from_tree(tree: dict, context: Context) -> dict:
+    provider_ranges = defaultdict(dict)
+
+    def walk(node):
+        for child in node.get("children", []):
+            if "nested_group" in child:
+                walk(child["nested_group"])
+            else:
+                code_type = child.get("code_type")
+                code_low = child.get("code_low")
+                is_not = child.get("not_logic_ind", False)
+
+                # ✅ Only keep if it's a provider-level type
+                if code_type in context.provider_code_range_types and code_low:
+                    provider_ranges[code_type][code_low] = {"not_logic_ind": is_not}
+
+    walk(tree)
+    return provider_ranges
+
 def expand_zip_code_range(code_low: str, code_high: str) -> list[str]:
 
     code_low = str(code_low)

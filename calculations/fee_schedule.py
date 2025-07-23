@@ -1,6 +1,7 @@
 from context import Context
 from constants import DEFAULT_EXP_DATE
 from rate_group_key_factory import RateGroupKeyFactory
+from rate_group_utilities import build_rate_group_key_if_needed
 from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_pos_and_type
@@ -37,7 +38,7 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
         else:
             schedule_name = key_tuple[0]
             rate_key = f"{term_bundle.rate_sheet_code}#{schedule_name}"
-
+        rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
         for modifier, proc_codes in schedule_values.items():
             for proc_code, proc_details in proc_codes.items():
                 code_type = proc_details.get("proc_code_type", "")
@@ -110,7 +111,7 @@ def process_fee_schedule_ranges(
         else:
             schedule_name = key_tuple[0]
             rate_key = f"{term_bundle.rate_sheet_code}#{schedule_name}"
-
+        rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
         for proc_code, modifier, pos, _ in service_mod_pos_list:
             pos = pos or '11'
 

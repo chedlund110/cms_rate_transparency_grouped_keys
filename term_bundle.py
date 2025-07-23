@@ -43,6 +43,7 @@ class TermBundle:
         self.subterms: Optional[list["TermBundle"]] = None
         self.service_mod_pos_list: Optional[Dict[str, Any]] = None
         self.has_services: Optional[bool]
+        self.provider_ranges = {}
         self.code_group_tree: Optional[dict] = None
         self.locality_fee_schedule_keys: Optional[tuple[str,str,str]] = None
 
@@ -62,3 +63,4 @@ class TermBundle:
 
     def _build_section_id(self) -> str:
         return f"{self.display_section_number}-{self.section_seq_number}"
+    

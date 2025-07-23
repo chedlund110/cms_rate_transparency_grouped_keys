@@ -27,21 +27,6 @@ def store_rate_record(
         return
     
     rate_cache[dict_key] = rate_dict
-    
-    if group_key and key_factory and code_tuple:
-
-        rate_sheet_code = group_key.split("#")[0]
-
-        key = key_factory.get_keys_for_rate_sheet(rate_sheet_code).get(group_key)
-
-        if not key:
-            # This should only happen if somehow the factory missed this key earlier
-            key = RateGroupKey(key=group_key, qualifiers=None)
-            key_factory.store[rate_sheet_code][group_key] = key  # <-- nested insert
-
-        # taking this out for now - we don't need codes by group key
-        # key.add_code(proc_code, modifier, pos)
-    
 
 def build_partial_indexes(provider_rates_temp: dict) -> dict[str, dict]:
     """
