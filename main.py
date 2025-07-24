@@ -15,7 +15,7 @@ from context_factory import build_context
 import cProfile
 from database_connection import DatabaseConnection
 from datetime import datetime
-from fee_schedule_loader import preload_all_locality_fee_schedules
+from fee_schedule_loader import preload_all_locality_fee_schedules, preload_fee_schedules
 import json
 from merge_output_files import merge_all_outputs
 from modifier_loader import load_modifier_map
@@ -102,6 +102,7 @@ def main():
     # the calculation methods are stored in the config
     # that way we don't have to hardcode in the logic
     provider_code_range_types = config.get("provider_code_range_types",{})
+    provider_code_field_map = config.get("provider_code_field_map")
     service_code_range_types: list = config.get("service_code_range_types",{})
     service_code_companion_range_types: list = config.get("service_code_companion_range_types",{})
 
@@ -151,12 +152,15 @@ def main():
     shared_config.ndc_codes = load_ndc_codes(networx_conn)
     shared_config.drg_weights = load_drg_weights(networx_conn)
     shared_config.locality_zip_ranges = load_locality_zip_ranges(networx_conn)
+    shared_config.provider_code_field_map = provider_code_field_map
 
     reference_dir = shared_config.directory_structure["reference_dir"]
     modifier_path = os.path.join(reference_dir, "procedure_modifier_map.txt")
     shared_config.modifier_map = load_modifier_map(modifier_path)
     context = build_context(shared_config, networx_conn, qnxt_conn)
     shared_config.locality_fee_schedules = preload_all_locality_fee_schedules(context)
+    preload_fee_schedules(context)
+    shared_config.fee_schedules = context.fee_schedules
     
     ensure_directories_exist(shared_config)
 
@@ -177,9 +181,9 @@ def main():
     # parallel process runner
     # rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config)
 
-    #run_all_providers(shared_config, rate_group_key_factory)
+    run_all_providers(shared_config, rate_group_key_factory)
 
-    #merge_all_outputs(shared_config)
+    merge_all_outputs(shared_config)
     
 if __name__ == "__main__":
     profiler = cProfile.Profile()

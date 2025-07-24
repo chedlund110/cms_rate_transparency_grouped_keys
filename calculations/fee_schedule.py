@@ -6,7 +6,6 @@ from rate_storage import store_rate_record
 from term_bundle import TermBundle
 from utilities import get_pos_and_type
 
-
 def process_fee_schedule(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     if term_bundle.service_mod_pos_list:
         process_fee_schedule_ranges(context, term_bundle, rate_cache, rate_group_key_factory)

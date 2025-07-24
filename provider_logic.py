@@ -7,27 +7,39 @@ from provider_bundle import ProviderBundle
 from utilities import build_in_clause_from_list, update_prov_grp_contract_keys
 from provider_bundle import ProviderBundle
 from rate_group_key_factory import RateGroupKeyFactory, RateGroupKey
+from shared_config import SharedConfig
 from context import Context
 from file_writer import write_provider_identifiers_record, write_prov_grp_contract_file
 
+def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dict, provider_code_field_map: dict) -> bool:
+    field_map = provider_code_field_map
 
-def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dict) -> bool:
-    return all([
-        not qualifiers.get("TAXONOMY") or provider_bundle.taxonomy in qualifiers["TAXONOMY"],
-        not qualifiers.get("ZIP") or provider_bundle.zip in qualifiers["ZIP"]
-    ])
+    for qualifier_type, allowed_values in qualifiers.items():
+        if not allowed_values:
+            continue
+
+        provider_attr_name = field_map.get(qualifier_type)
+        if not provider_attr_name:
+            continue  # skip unknown qualifier types
+
+        provider_value = getattr(provider_bundle, provider_attr_name, None)
+        if provider_value not in allowed_values:
+            return False
+
+    return True
 
 def process_single_provider(
         provider_bundle: ProviderBundle,
         group_keys: dict[str, RateGroupKey],
-        context: Context
+        context: Context,
+        shared_config: SharedConfig
     ) -> None:
 
     # Attach (carrier, locality) match based on provider ZIP + carrier_number
     attach_provider_locality_info(provider_bundle, context)
-
+    provider_code_field_map = shared_config.provider_code_field_map
     for group_key, rgk in group_keys.items():
-        if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers):
+        if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers, provider_code_field_map):
 
             # If the rate sheet requires locality match, and none was found, skip
             rate_sheet_code = group_key.split("#")[0]

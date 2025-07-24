@@ -67,6 +67,14 @@
         "CodeTypeSpecialty",
         "CodeTypeProviderZip"
     ],
+    "provider_code_field_map":{
+    "CodeTypeServiceProviderTaxID": "fedid",
+    "CodeTypeProviderNPI": "npi",
+    "CodeTypeProviderID": "provid",
+    "CodeTypeProviderType": "provtype",
+    "CodeTypeProviderTaxonomyCode": "taxonomy",
+    "CodeTypeProviderZip": "prov_zip"
+    },
     "service_code_range_types": [
         "CodeTypeNDCCodeLine",
         "CodeTypeCPT4Procedure",

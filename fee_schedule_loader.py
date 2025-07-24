@@ -53,6 +53,34 @@ def preload_all_locality_fee_schedules(context: Context) -> dict:
 
     return locality_fee_schedules
 
+def preload_fee_schedules(context: Context) -> dict:
+    """
+    Preloads all standard fee schedules used in rate sheets into context.fee_schedules.
+    This avoids redundant loading during fee schedule processing.
+    """
+    query = """
+    SELECT DISTINCT stdratesheetterms.actionparm1 AS schedulename
+    FROM STDRATESHEETS
+    LEFT JOIN STDRATESHEETTERMS
+        ON STDRATESHEETS.RATESHEETID = STDRATESHEETTERMS.RATESHEETID
+    INNER JOIN SCHEDULEVALUESWITHMODIFIERS
+        ON STDRATESHEETTERMS.actionparm1 = SCHEDULEVALUESWITHMODIFIERS.tablename
+    WHERE
+        STDRATESHEETS.RATESHEETCODE IS NOT NULL AND
+        STDRATESHEETS.RATESHEETCODE LIKE 'AV%' AND 
+        STDRATESHEETS.RATESHEETCODE NOT LIKE 'AVGB%' AND 
+        STDRATESHEETS.RATESHEETCODE NOT LIKE 'Z%' AND  
+        STDRATESHEETS.RATESHEETCODE NOT LIKE '%-%'
+    """
+    context.fee_schedules = {}
+    rows = context.networx_conn.execute_query_with_columns(query)
+
+    for row in rows:
+        schedule_name = row["schedulename"]
+        if schedule_name not in context.fee_schedules:
+            load_fee_schedule(context, schedule_name)
+    
+
 def process_fee_schedule_rows(
     context: Context, fee_schedule_name: str, rows: list[dict[str, Any]]
 ) -> dict:
@@ -106,7 +134,6 @@ def load_fee_schedule(context: Context, schedule_name: str) -> list[tuple[str, s
         if key in context.shared_config.locality_fee_schedules and key not in seen_keys:
             seen_keys.add(key)
             locality_keys.append(key)
-
             context.fee_schedules[schedule_name] = {}
 
     else:
