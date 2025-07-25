@@ -8,13 +8,13 @@ from utilities import get_pos_and_type
 from decimal import Decimal, ROUND_HALF_UP
 
 def process_percent_of_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    if term_bundle.service_mod_pos_list:
+    if term_bundle.service_mod_pos_list or term_bundle.provider_ranges:
         process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {}, rate_group_key_factory)
     else:
         process_percent_of_allowed_full(context, term_bundle, rate_cache, rate_group_key_factory)
 
 def process_percent_of_allowed_plus_fd_amt(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    if term_bundle.service_mod_pos_list:
+    if term_bundle.service_mod_pos_list or term_bundle.provider_ranges:
         process_percent_of_allowed_ranges(context, term_bundle, rate_cache, {}, rate_group_key_factory)
     else:
         process_percent_of_allowed_full(context, term_bundle, rate_cache, rate_group_key_factory)
