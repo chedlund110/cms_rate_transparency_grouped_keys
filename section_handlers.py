@@ -42,14 +42,15 @@ def process_inpatient_services(context: Context, inpatient_services: list[dict],
 
 def process_inpatient_exclusions(context: Context, inpatient_exclusions: list[dict], rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     rate_type_desc = 'institutional'
+    is_exclusion: bool = True
     for term in inpatient_exclusions:
         subterms = term.get("subterms",{})
         if subterms:
             for subterm in subterms:
-                term_bundle = TermBundle(subterm, rate_type_desc=rate_type_desc)
+                term_bundle = TermBundle(subterm, rate_type_desc=rate_type_desc, is_exclusion=is_exclusion)
                 process_term(context, term_bundle, rate_cache, rate_group_key_factory)
         else:
-            term_bundle = TermBundle(term, rate_type_desc=rate_type_desc)
+            term_bundle = TermBundle(term, rate_type_desc=rate_type_desc, is_exclusion=is_exclusion)
             process_term(context, term_bundle, rate_cache, rate_group_key_factory)
 
 def process_outpatient_case_rate(context: Context, outpatient_case_rate: list[dict], rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
@@ -90,14 +91,15 @@ def process_outpatient_services(context: Context, outpatient_services: list[dict
 
 def process_outpatient_exclusions(context: Context, outpatient_exclusions: list[dict], rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     rate_type_desc = 'professional'
+    is_exclusion = True
     for term in outpatient_exclusions:
         subterms = term.get("subterms",{})
         if subterms:
             for subterm in subterms:
-                term_bundle = TermBundle(subterm, rate_type_desc=rate_type_desc)
+                term_bundle = TermBundle(subterm, rate_type_desc=rate_type_desc, is_exclusion=is_exclusion)
                 process_term(context, term_bundle, rate_cache, rate_group_key_factory)
         else:
-            term_bundle = TermBundle(term)
+            term_bundle = TermBundle(term, is_exclusion=is_exclusion)
             process_term(context, term_bundle, rate_cache, rate_group_key_factory)
 
 

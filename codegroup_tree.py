@@ -248,12 +248,15 @@ def generate_service_combinations(context: Context, tree: dict) -> dict:
         if combinations:
             has_services = True
 
-    # --- Case 3: POS-only fallback ---
-    if not has_services and not result["modifiers"] and included_pos:
+    # Case 3: POS-only fallback
+    included_pos = sorted(result["pos"] - result["excluded_pos"])
+    if not included_pos and result["pos"]:
+        included_pos = ['11']
+
+    if not result["services"] and not result["modifiers"] and included_pos:
         combinations.extend(
             ('', '', pos, '') for pos in included_pos
         )
-        # has_services remains False
 
     return {
         "combinations": combinations,

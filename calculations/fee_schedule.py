@@ -39,7 +39,7 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
             rate_key = f"{term_bundle.rate_sheet_code}#{schedule_name}"
 
         rate_key = build_rate_group_key_if_needed(term_bundle, rate_key, rate_group_key_factory)
-        
+
         for modifier, proc_codes in schedule_values.items():
             for proc_code, proc_details in proc_codes.items():
                 code_type = proc_details.get("proc_code_type", "")
@@ -59,7 +59,7 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
                 if term_bundle.base_pct_of_charge:
                     fee = round(allow_amt * term_bundle.base_pct_of_charge, 2)
 
-                dict_key = (schedule_name, proc_code, modifier, rate_pos, code_type)
+                dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, rate_pos, code_type)
                 rate_dict = {
                     "update_type": "A",
                     "insurer_code": context.insurer_code,
@@ -180,7 +180,7 @@ def _process_fee_schedule_range_common(
             fee = allow_amt if allow_amt > 0 else (percentage * 100 if percentage > 0 else 0)
             fee_type = "fee schedule" if allow_amt > 0 else "percentage" if percentage > 0 else "fee schedule"
 
-            dict_key = (schedule_name, code, mod, pos, code_type)
+            dict_key = (term_bundle.rate_sheet_code, code, mod, pos, code_type)
             rate_dict = {
                 "update_type": "A",
                 "insurer_code": context.insurer_code,

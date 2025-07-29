@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 from decimal import Decimal, ROUND_HALF_UP
 
 class TermBundle:
-    def __init__(self, term: Dict[str, Any], parent_code_group_id: Optional[int] = 0, rate_type_desc: Optional[str] = 'professional') -> None:
+    def __init__(self, term: Dict[str, Any], parent_code_group_id: Optional[int] = 0, rate_type_desc: Optional[str] = 'professional', is_exclusion=False) -> None:
         
         self.rate_sheet_code = term.get("RATESHEETCODE", "")
         self.calc_bean: str = (term.get("CALCBEAN") or "").strip()
@@ -46,6 +46,7 @@ class TermBundle:
         self.provider_ranges = {}
         self.code_group_tree: Optional[dict] = None
         self.locality_fee_schedule_keys: Optional[tuple[str,str,str]] = None
+        self.is_exclusion: bool = is_exclusion
 
     def _get_decimal(self, term: Dict[str, Any], key: str) -> Decimal:
         raw = term.get(key, "")
