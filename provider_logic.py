@@ -38,15 +38,16 @@ def process_single_provider(
     # Attach (carrier, locality) match based on provider ZIP + carrier_number
     attach_provider_locality_info(provider_bundle, context)
     provider_code_field_map = shared_config.provider_code_field_map
-    for group_key, rgk in group_keys.items():
-        if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers, provider_code_field_map):
+    for group_key, rgk_list in group_keys.items():
+        for rgk in rgk_list:
+            if rgk.qualifiers is None or provider_matches_qualifiers(provider_bundle, rgk.qualifiers, provider_code_field_map):
 
-            # If the rate sheet requires locality match, and none was found, skip
-            rate_sheet_code = group_key.split("#")[0]
-            
-            if "#locality" in group_key:
-                if not getattr(provider_bundle, "locality_key", None):
-                    continue  # Skip if no locality match
+                # If the rate sheet requires locality match, and none was found, skip
+                rate_sheet_code = group_key.split("#")[0]
+                
+                if "#locality" in group_key:
+                    if not getattr(provider_bundle, "locality_key", None):
+                        continue  # Skip if no locality match
 
             update_prov_grp_contract_keys(provider_bundle, group_key)
             write_provider_identifiers_record(context, provider_bundle, group_key)

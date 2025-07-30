@@ -44,7 +44,7 @@ def process_ratesheet_worker(
         process_outpatient_services(context, ratesheet.get("outpatient services", []), rate_cache, rate_group_key_factory)
         process_outpatient_case_rate(context, ratesheet.get("outpatient case rate", []), rate_cache, rate_group_key_factory)
         process_outpatient_per_diem(context, ratesheet.get("outpatient per diem", []), rate_cache, rate_group_key_factory)
-        # process_outpatient_exclusions(context, ratesheet.get("outpatient exclusions", []), rate_cache, rate_group_key_factory)
+        process_outpatient_exclusions(context, ratesheet.get("outpatient exclusions", []), rate_cache, rate_group_key_factory)
         
         rate_file_writer.flush_cache(rate_cache)
         rate_cache.clear()

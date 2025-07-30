@@ -10,22 +10,45 @@ from decimal import Decimal, ROUND_HALF_UP
 
 def process_percent_of_allowed(context: Context, term_bundle: TermBundle,
                                 rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
-    
+
     ensure_rate_cache_index(context, rate_cache)
     rate_index = context.rate_cache_index
 
     has_service_filters = bool(term_bundle.service_mod_pos_list)
     has_provider_filters = bool(term_bundle.provider_ranges)
 
-    if has_service_filters:
-        filtered_keys = _filter_rate_keys_by_service(term_bundle, rate_index)
-    else:
-        filtered_keys = list(rate_cache.keys())
-
     if has_provider_filters:
+        # Handles provider-level filters like Taxonomy/NPI/ZIP
+        if has_service_filters:
+            filtered_keys = _filter_rate_keys_by_service(term_bundle, rate_index)
+        else:
+            filtered_keys = list(rate_cache.keys())
         _process_poa_by_copy(context, term_bundle, rate_cache, filtered_keys, rate_group_key_factory)
     else:
-        _process_poa_in_place(context, term_bundle, rate_cache, filtered_keys, rate_group_key_factory)
+        # Optimized flow for service+modifier only (no provider filters)
+        _process_poa_without_provider_filters(context, term_bundle, rate_cache, rate_group_key_factory)
+
+
+def _process_poa_without_provider_filters(context: Context, term_bundle: TermBundle,
+                                          rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
+    base_pct = term_bundle.base_pct_of_charge or 1.0
+    rate_sheet_code = term_bundle.rate_sheet_code
+
+    for proc_code, modifier, pos, code_type in term_bundle.service_mod_pos_list:
+        base_key = (rate_sheet_code, proc_code, '', pos, code_type)
+        base_entry = rate_cache.get(base_key)
+
+        if not base_entry:
+            continue
+
+        fee, fee_type = _calculate_poa_rate(base_entry, base_pct)
+        base_rate_key = base_entry.get("prov_grp_contract_key", "")
+        rate_key = build_rate_group_key_if_needed(term_bundle, base_rate_key, rate_group_key_factory)
+
+        _build_and_store_rate(context, term_bundle, base_entry,
+                              proc_code, modifier, pos, code_type,
+                              fee, fee_type, rate_key,
+                              rate_cache, rate_group_key_factory)
 
 
 def _filter_rate_keys_by_service(term_bundle: TermBundle, rate_index: dict) -> list:
@@ -43,19 +66,10 @@ def _filter_rate_keys_by_service(term_bundle: TermBundle, rate_index: dict) -> l
         mod_keys = set(by_mod.get(modifier, []))
         pos_keys = set(by_pos.get(pos, []))
 
-        # Union of all potentially matching keys
-        all_keys = proc_keys | mod_keys | pos_keys
-
-        for key in all_keys:
-            _, svc, mod, p, typ = key
-            if (not proc_code or svc == proc_code) and \
-               (not modifier or mod == modifier) and \
-               (not pos or p == pos) and \
-               (not code_type or typ == code_type):
-                result.add(key)
+        matched = proc_keys & mod_keys & pos_keys
+        result.update(matched)
 
     return list(result)
-
 
 
 def _calculate_poa_rate(base_entry: dict, base_pct: float) -> tuple[float, str]:
@@ -104,30 +118,6 @@ def _build_and_store_rate(context: Context, term_bundle: TermBundle,
     store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple,
                       context.shared_config.valid_service_codes, context.rate_cache_index,
                       was_poa=True, source_term_id=term_bundle.term_id, is_exclusion=term_bundle.is_exclusion)
-
-
-def _process_poa_in_place(context: Context, term_bundle: TermBundle,
-                          rate_cache: dict, filtered_keys: list,
-                          rate_group_key_factory: RateGroupKeyFactory) -> None:
-    base_pct = term_bundle.base_pct_of_charge or 1.0
-
-    for key in filtered_keys:
-        if len(key) == 5:
-            rate_sheet_code, proc_code, modifier, pos, code_type = key
-        else:
-            rate_sheet_code, proc_code, modifier, pos, code_type, _ = key
-
-        base_entry = rate_cache.get(key)
-        if not base_entry:
-            continue
-
-        fee, fee_type = _calculate_poa_rate(base_entry, base_pct)
-        rate_key = base_entry.get("prov_grp_contract_key", "")
-
-        _build_and_store_rate(context, term_bundle, base_entry,
-                              proc_code, modifier, pos, code_type,
-                              fee, fee_type, rate_key,
-                              rate_cache, rate_group_key_factory)
 
 
 def _process_poa_by_copy(context: Context, term_bundle: TermBundle,
