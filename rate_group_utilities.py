@@ -20,7 +20,7 @@ def build_rate_group_key_if_needed(
     if standard_group_key not in sheet_store:
         sheet_store[standard_group_key] = RateGroupKey(
             key=standard_group_key,
-            qualifiers=None  # No qualifiers for standard key
+            qualifiers={}  # No qualifiers for standard key
         )
 
     provider_ranges = term_bundle.provider_ranges
@@ -53,7 +53,6 @@ def build_rate_group_key_if_needed(
             block[short_key] = included
         if excluded:
             block[f"not_{short_key}"] = excluded
-        filter_section.append(block)
 
         # Store the qualified key as a full RateGroupKey instance
         sheet_store[qualified_group_key] = RateGroupKey(

@@ -124,7 +124,7 @@ def main():
     qnxt_db_config = config["qnxt_database"]
     qnxt_connection_string = (f"Driver={qnxt_db_config['driver']};"f"Server={qnxt_db_config['server']};"f"Port={qnxt_db_config['port']};"f"Database={qnxt_db_config['database']};"f"Trusted_Connection={'yes' if qnxt_db_config['trusted_connection'] else 'no'};")
     
-    # use the DatabaseConnection object
+    # Networx database
     networx_conn = DatabaseConnection(networx_connection_string)
     qnxt_conn = DatabaseConnection(qnxt_connection_string)
 
