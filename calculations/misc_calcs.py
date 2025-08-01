@@ -60,7 +60,7 @@ def process_per_item(context: Context, term_bundle: TermBundle, rate_cache: dict
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
 
 def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -107,7 +107,7 @@ def process_unit_ltd_by_chg(context: Context, term_bundle: TermBundle, rate_cach
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
 
 def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -154,7 +154,7 @@ def process_percent_plus_excess(context: Context, term_bundle: TermBundle, rate_
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
 
 def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -201,7 +201,7 @@ def process_visit_plus_rate_per_hour(context: Context, term_bundle: TermBundle, 
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
 
 def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -247,7 +247,7 @@ def process_flat_dollar_discount(context: Context, term_bundle: TermBundle, rate
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
 
 def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -296,7 +296,7 @@ def process_ndc(context: Context, term_bundle: TermBundle, rate_cache: dict, rat
 
         code_tuple = (ndc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, ndc_code, modifier, pos, "NDC")
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
 
 def process_optum_physician_pricer(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     # for the professional optum pricer, we just need to use the global rate sheet

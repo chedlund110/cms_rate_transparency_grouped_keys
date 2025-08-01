@@ -17,6 +17,8 @@ def process_percent_of_allowed(context: Context, term_bundle: TermBundle,
     has_service_filters = bool(term_bundle.service_mod_pos_list)
     has_provider_filters = bool(term_bundle.provider_ranges)
 
+    term_bundle.was_poa = True
+
     if has_provider_filters:
         # Handles provider-level filters like Taxonomy/NPI/ZIP
         if has_service_filters:
@@ -117,7 +119,7 @@ def _build_and_store_rate(context: Context, term_bundle: TermBundle,
     
     store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple,
                       context.shared_config.valid_service_codes, context.rate_cache_index,
-                      was_poa=True, source_term_id=term_bundle.term_id, is_exclusion=term_bundle.is_exclusion)
+                      term_bundle=term_bundle)
 
 
 def _process_poa_by_copy(context: Context, term_bundle: TermBundle,

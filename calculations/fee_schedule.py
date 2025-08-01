@@ -78,7 +78,7 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
                     "calc_bean": calc_bean
                 }
                 code_tuple = (proc_code, modifier, rate_pos)
-                store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes)
+                store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
 
 def process_fee_schedule_ranges(
     context: Context,
@@ -212,5 +212,6 @@ def _process_fee_schedule_range_common(
                 rate_key,
                 rate_group_key_factory,
                 (code, mod, rate_pos),
-                context.shared_config.valid_service_codes
+                context.shared_config.valid_service_codes,
+                term_bundle=term_bundle
             )

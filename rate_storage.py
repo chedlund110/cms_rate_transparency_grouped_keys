@@ -13,9 +13,7 @@ def store_rate_record(
     valid_service_codes: tuple[str, str] = None,
     rate_cache_index: dict = None,
     *,
-    was_poa: bool = False,
-    source_term_id: str | None = None,
-    is_exclusion: bool = False,
+    term_bundle
 ) -> None:
     """
     Stores a rate record for a single rate sheet using a temporary dict.
@@ -34,16 +32,16 @@ def store_rate_record(
 
     # Exclusion logic: allow overwrite only if is_exclusion is True
     existing = rate_cache.get(dict_key)
-    if existing and not is_exclusion:
+    if existing and not term_bundle.term_bundle.is_exclusion:
         # Do not overwrite existing rate unless this is an exclusion
         return
 
     # Inject flags into the rate dict
-    rate_dict["was_poa"] = was_poa
-    rate_dict["source_term_id"] = source_term_id
+    rate_dict["was_poa"] = term_bundle.was_poa
+    rate_dict["source_term_id"] = term_bundle.term_id
 
     # Only update indexes for non-POA terms
-    if rate_cache_index is not None and not was_poa:
+    if rate_cache_index is not None and not term_bundle.was_poa:
         rate_sheet_code = dict_key[0]
 
         # Update by_proc
