@@ -34,8 +34,9 @@ def store_rate_record(
     # Exclusion logic: allow overwrite only if is_exclusion is True
     existing = rate_cache.get(dict_key)
     if existing and not term_bundle.is_exclusion:
-        # Do not overwrite existing rate unless this is an exclusion
-        return
+        if existing == rate_dict:
+            # Do not overwrite existing rate unless this is an exclusion
+            return
 
     # Inject flags into the rate dict
     rate_dict["was_poa"] = term_bundle.was_poa
