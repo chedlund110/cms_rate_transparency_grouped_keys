@@ -44,7 +44,7 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
             for proc_code, proc_details in proc_codes.items():
                 code_type = proc_details.get("proc_code_type", "")
                 allow_amt = round(proc_details.get("allowed", 0), 2)
-                percentage = proc_details.get("percentage", 0)
+                percentage = proc_details.get("percentage",0)
 
                 if allow_amt > 0:
                     fee = allow_amt
@@ -153,6 +153,7 @@ def _process_fee_schedule_range_common(
     calc_bean = term_bundle.calc_bean
     rate_pos, rate_type_desc = get_pos_and_type(section_name="")
     service_mod_pos_list = list(term_bundle.service_mod_pos_list or [])
+    base_pct_of_charge = term_bundle.base_pct_of_charge
 
     for proc_code, modifier, pos, _ in service_mod_pos_list:
         pos = pos or "11"
@@ -176,8 +177,13 @@ def _process_fee_schedule_range_common(
         for code, mod, detail in proc_maps:
             code_type = detail.get("proc_code_type", "")
             allow_amt = round(detail.get("allowed", 0), 2)
-            percentage = detail.get("percentage", 0)
-            fee = allow_amt if allow_amt > 0 else (percentage * 100 if percentage > 0 else 0)
+            percentage = detail.get("percentage",0)
+            if allow_amt > 0:
+                fee = allow_amt
+                if base_pct_of_charge > 0:
+                    fee = round(fee * base_pct_of_charge,2)
+            else:
+                fee = percentage
             fee_type = "fee schedule" if allow_amt > 0 else "percentage" if percentage > 0 else "fee schedule"
 
             dict_key = (term_bundle.rate_sheet_code, code, mod, pos, code_type)
