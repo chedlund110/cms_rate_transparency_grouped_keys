@@ -11,7 +11,6 @@ from decimal import Decimal, ROUND_HALF_UP
 def process_percent_of_allowed(context: Context, term_bundle: TermBundle,
                                 rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
 
-    ensure_rate_cache_index(context, rate_cache)
     rate_index = context.rate_cache_index
 
     has_service_filters = bool(term_bundle.service_mod_pos_list)
@@ -38,20 +37,18 @@ def _process_poa_without_provider_filters(context: Context, term_bundle: TermBun
 
     for proc_code, modifier, pos, code_type in term_bundle.service_mod_pos_list:
         base_key = (rate_sheet_code, proc_code, '', pos, code_type)
-        base_entry = rate_cache.get(base_key)
+        rate_groups = rate_cache.get(base_key)
+        if rate_groups:
+            for group_key, rate_dict in rate_groups.items():
+                if not rate_dict["qualified"]:
+                    fee, fee_type = _calculate_poa_rate(rate_dict, base_pct)
+                    base_rate_key = rate_dict["prov_grp_contract_key"]
+                    rate_key = build_rate_group_key_if_needed(term_bundle, base_rate_key, rate_group_key_factory)
 
-        if not base_entry:
-            continue
-
-        fee, fee_type = _calculate_poa_rate(base_entry, base_pct)
-        base_rate_key = base_entry.get("prov_grp_contract_key", "")
-        rate_key = build_rate_group_key_if_needed(term_bundle, base_rate_key, rate_group_key_factory)
-
-        _build_and_store_rate(context, term_bundle, base_entry,
-                              proc_code, modifier, pos, code_type,
-                              fee, fee_type, rate_key,
-                              rate_cache, rate_group_key_factory)
-
+                    _build_and_store_rate(context, term_bundle, rate_dict,
+                                        proc_code, modifier, pos, code_type,
+                                        fee, fee_type, rate_key,
+                                        rate_cache, rate_group_key_factory)
 
 def _filter_rate_keys_by_service(term_bundle: TermBundle, rate_index: dict) -> list:
     rate_sheet_code = term_bundle.rate_sheet_code
@@ -127,25 +124,33 @@ def _process_poa_by_copy(context: Context, term_bundle: TermBundle,
                          rate_group_key_factory: RateGroupKeyFactory) -> None:
     base_pct = term_bundle.base_pct_of_charge or 1.0
 
+    # Build the NEW rate group key to store under
+    new_rate_key = build_rate_group_key_if_needed(
+        term_bundle,
+        term_bundle.rate_sheet_code,
+        rate_group_key_factory
+    )
+
     for key in filtered_keys:
         if len(key) == 5:
             rate_sheet_code, proc_code, modifier, pos, code_type = key
         else:
             rate_sheet_code, proc_code, modifier, pos, code_type, _ = key
 
-        base_entry = rate_cache.get(key)
-        if not base_entry:
-            continue
+        rate_groups = rate_cache.get(key)
+        if rate_groups:
+            for group_key, rate_dict in rate_groups.items():
+                if not rate_dict["qualified"]:
+                    new_rate_dict = rate_dict.copy()
+                    new_rate_dict["qualified"] = False
+                    fee, fee_type = _calculate_poa_rate(new_rate_dict, base_pct)
 
-        fee, fee_type = _calculate_poa_rate(base_entry, base_pct)
-        standard_key = base_entry.get("prov_grp_contract_key", "")
-        rate_key = build_rate_group_key_if_needed(term_bundle, standard_key, rate_group_key_factory)
-
-        _build_and_store_rate(context, term_bundle, base_entry,
-                              proc_code, modifier, pos, code_type,
-                              fee, fee_type, rate_key,
-                              rate_cache, rate_group_key_factory)
-
+                    _build_and_store_rate(
+                        context, term_bundle, new_rate_dict,
+                        proc_code, modifier, pos, code_type,
+                        fee, fee_type, new_rate_key,  # store under new key!
+                        rate_cache, rate_group_key_factory
+                    )
 
 def process_percent_of_allowed_plus_fd_amt(context: Context, term_bundle: TermBundle,
                                            rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:

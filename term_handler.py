@@ -13,7 +13,7 @@ import time
 def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     
     start_time = time.perf_counter()
-    print(f"Term Number: {term_bundle.parent_section_number}.{term_bundle.parent_seq_number}.{term_bundle.section_seq_number}")
+    print(f"Term Number: {term_bundle.full_term_display_id}")
     before_size = len(rate_cache)
     print(f"Rate Cache Size: {len(rate_cache)}")
 

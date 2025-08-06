@@ -14,8 +14,8 @@ from file_writer import write_provider_identifiers_record, write_prov_grp_contra
 def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dict, provider_code_field_map: dict) -> bool:
     field_map = provider_code_field_map
 
-    for qualifier_type, allowed_values in qualifiers.items():
-        if not allowed_values:
+    for qualifier_type, code_conditions in qualifiers.items():
+        if not code_conditions:
             continue
 
         provider_attr_name = field_map.get(qualifier_type)
@@ -23,10 +23,22 @@ def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dic
             continue  # skip unknown qualifier types
 
         provider_value = getattr(provider_bundle, provider_attr_name, None)
-        if provider_value not in allowed_values:
+        if provider_value is None:
             return False
 
+        # Check both include and not-logic conditions
+        for code_value, condition in code_conditions.items():
+            is_not = condition.get("not_logic_ind", False)
+
+            if is_not:
+                if provider_value == code_value:
+                    return False  # Exclude match
+            else:
+                if provider_value != code_value:
+                    return False  # Require inclusion match
+
     return True
+
 
 def process_single_provider(
         provider_bundle: ProviderBundle,
@@ -100,7 +112,8 @@ def fetch_providers(context) -> list[dict[str, Any]]:
     #    "URG", "AMB", "HCC", "HIF", "HSP", "DIA", "DME", "PHC", "DTC", "DTX", "AUD"
     #]
     #facility_clause = ', '.join(f"'{x}'" for x in facility_indicators)
-    
+    # prov.provid = 'PRU21429642' and
+    # NxRateSheetId = 'AVCRPRF00221' and 
     query = f"""
     SELECT
         PROV.provid,
@@ -126,6 +139,7 @@ def fetch_providers(context) -> list[dict[str, Any]]:
     LEFT JOIN contractinfo CTR ON CTR.affiliationid = AFF.affiliationid
     LEFT JOIN ContractNxRateSheet CTRNX ON CTRNX.ContractId = CTR.contractid
     WHERE
+        NxRateSheetId = 'AVCRPRF00417' AND 
         NxRateSheetId IS NOT NULL AND 
         NxRateSheetId LIKE 'AV%' AND 
         NxRateSheetId not like 'Z%' AND  

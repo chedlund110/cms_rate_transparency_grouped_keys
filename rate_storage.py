@@ -32,18 +32,47 @@ def store_rate_record(
         return
 
     # Exclusion logic: allow overwrite only if is_exclusion is True
-    existing = rate_cache.get(dict_key)
-    if existing and not term_bundle.is_exclusion:
-        if existing == rate_dict:
-            # Do not overwrite existing rate unless this is an exclusion
+    # We're tracking rate dict items by tuple, then by group_key
+    # The reason is we could have different rates by section
+    # in the rate sheet for the same code
+
+    entry = rate_cache.setdefault(dict_key, {})
+    existing = entry.get(group_key)
+    if existing:
+        if term_bundle.is_exclusion:
+            # Exclusions always override
+            entry[group_key] = rate_dict
+        elif existing == rate_dict:
+            # Exact same record — skip
             return
+        else:
+            # We have a conflict — optional: log it
+            return  # Or keep first value, or overwrite
+    else:
+        # First time seeing this group key
+        if not term_bundle.is_exclusion:
+            entry[group_key] = rate_dict
 
     # Inject flags into the rate dict
     rate_dict["was_poa"] = term_bundle.was_poa
-    rate_dict["source_term_id"] = term_bundle.term_id
+    
+    if not(hasattr(rate_dict,"full_term_display_id")):
+        rate_dict["full_term_display_id"] = ''
+        
+    temp_full_term_display_id = rate_dict["full_term_display_id"].strip()
+    if temp_full_term_display_id == '':
+        rate_dict["full_term_display_id"] = term_bundle.full_term_display_id
+    else:
+        rate_dict["full_term_display_id"] = str(temp_full_term_display_id) + "," + str(term_bundle.full_term_display_id)
+
+    has_provider_qualifiers = term_bundle.provider_ranges
+    if has_provider_qualifiers:
+        rate_dict["qualified"] = True
+    else:
+        rate_dict["qualified"] = False
 
     # Only update indexes for non-POA terms
-    if rate_cache_index is not None and not term_bundle.was_poa:
+    if rate_cache_index and not term_bundle.was_poa:
         rate_sheet_code = dict_key[0]
 
         # Update by_proc
@@ -60,8 +89,6 @@ def store_rate_record(
         if "by_pos" in rate_cache_index:
             by_pos = rate_cache_index["by_pos"].setdefault(rate_sheet_code, {})
             by_pos.setdefault(pos, set()).add(dict_key)
-
-    rate_cache[dict_key] = rate_dict
 
 def build_rate_cache_index(rate_cache: dict) -> dict:
     """

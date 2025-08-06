@@ -34,6 +34,10 @@ def load_ratesheet(context: Context, query: str, rate_sheet_code: str = None) ->
         section_name = section_mapping.get(section_number, "")
         if not section_name:
             continue
+        
+        seq_number = term.get("SEQNUMBER")
+        full_term_display_id = str(section_number) + "." + str(seq_number)
+        term["FULLTERMDISPLAYID"] = full_term_display_id
 
         sub_rate_sheet_id = term.get("SUBRATESHEETID")
         sub_rate_sheet_ind = term.get("SUBRATESHEETIND")
@@ -108,12 +112,16 @@ def load_subterms(context: Context, rate_sheet_id: str, term: dict) -> list[dict
 
     parent_section_number = int(term.get("DISPLAYSECTIONNUMBER") or 0)
     parent_seq_number = int(term.get("SEQNUMBER") or 0)
+    parent_full_term_display_id = term.get("FULLTERMDISPLAYID")
 
     for subterm in rate_sheet_terms:
         if rate_sheet_code:
             subterm["RATESHEETCODE"] = rate_sheet_code
         subterm["PARENTSECTIONNUMBER"] = parent_section_number
         subterm["PARENTSEQNUMBER"] = parent_seq_number
+        seq_number = subterm["SEQNUMBER"]
+        full_term_display_id = str(parent_full_term_display_id) + "." + str(seq_number)
+        subterm["FULLTERMDISPLAYID"] = full_term_display_id
         subterms.append(subterm)
 
     context.subratesheet_cache[rate_sheet_id] = subterms

@@ -7,6 +7,7 @@ class BufferedRateFileWriter:
     def __init__(self, target_directory: str, file_prefix: str):
         self.target_directory = os.path.normpath(target_directory)
         self.file_prefix = file_prefix
+        self.closed = False
         self.current_file_index = 1
         self.current_file_size = 0
         self.records_processed = 0
@@ -23,10 +24,16 @@ class BufferedRateFileWriter:
         self.buffer = BytesIO()
 
     def write(self, rate_record_dict: dict) -> None:
+        """
         line = FIELD_DELIM.join(
             str(rate_record_dict.get(field, ""))
             for field in rate_template.keys()
-        ) + FIELD_DELIM + "\n"
+        ) + FIELD_DELIM + rate_record_dict["full_term_display_id"] + "\n"
+        """
+        line = FIELD_DELIM.join(
+            str(rate_record_dict.get(field, ""))
+            for field in rate_template.keys()
+        ) + "\n"
 
         encoded_line = line.encode("utf-8")
         line_size = len(encoded_line)
@@ -40,24 +47,36 @@ class BufferedRateFileWriter:
         self.records_processed += 1
 
     def flush(self):
+    # Check if buffer is present and not closed
+        if not self.buffer or getattr(self.buffer, "closed", False):
+            return
+
         if self.buffer.tell() == 0:
             return
 
-        os.makedirs(os.path.dirname(self.current_file_path), exist_ok=True)  # Ensure path exists
+        os.makedirs(os.path.dirname(self.current_file_path), exist_ok=True)
         with open(self.current_file_path, "ab") as f:
             with BufferedWriter(f, buffer_size=10_000_000) as buffered:
                 buffered.write(self.buffer.getvalue())
                 buffered.flush()
+
+        # Reset the buffer (creates a new BytesIO to avoid reuse of a closed one)
+        self.buffer.close()
         self.buffer = BytesIO()
 
     def flush_cache(self, rate_cache: dict) -> None:
-        for rate_dict in rate_cache.values():
-            self.write(rate_dict)
+        for group_dict in rate_cache.values():
+            for rate_dict in group_dict.values():
+                self.write(rate_dict)
         self.flush()
 
     def close_all_files(self):
+        if self.closed:
+            return
         self.flush()
-        self._create_mms_file()
+        if self.buffer and not self.buffer.closed:
+            self.buffer.close()
+        self.closed = True
 
     def _create_mms_file(self):
         mms_filename = os.path.splitext(self.current_file_path)[0] + ".MMS"

@@ -12,25 +12,31 @@ def process_fee_schedule(context: Context, term_bundle: TermBundle, rate_cache: 
     else:
         process_fee_schedule_full(context, term_bundle, rate_cache, rate_group_key_factory)
 
-
-def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
+def process_fee_schedule_full(
+    context: Context,
+    term_bundle: TermBundle,
+    rate_cache: dict,
+    rate_group_key_factory: RateGroupKeyFactory
+) -> None:
     section_id = term_bundle.section_id
     calc_bean = term_bundle.calc_bean
     rate_pos, rate_type_desc = get_pos_and_type(section_name='')
 
-    def get_schedules():
-        if hasattr(term_bundle, "locality_fee_schedule_keys") and term_bundle.locality_fee_schedule_keys:
-            for key in term_bundle.locality_fee_schedule_keys:
-                schedule_values = context.shared_config.locality_fee_schedules.get(key, {})
-                if schedule_values:
-                    yield (key, schedule_values)
-        else:
-            fee_schedule_name = term_bundle.fee_schedule_name
-            schedule_values = context.fee_schedules.get(fee_schedule_name, {})
+    # Build schedule list explicitly
+    schedule_items = []
+    if getattr(term_bundle, "locality_fee_schedule_keys", None):
+        for key in term_bundle.locality_fee_schedule_keys:
+            schedule_values = context.shared_config.locality_fee_schedules.get(key)
             if schedule_values:
-                yield ((fee_schedule_name,), schedule_values)
+                schedule_items.append((key, schedule_values))
+    else:
+        fee_schedule_name = term_bundle.fee_schedule_name
+        schedule_values = context.fee_schedules.get(fee_schedule_name)
+        if schedule_values:
+            schedule_items.append(((fee_schedule_name,), schedule_values))
 
-    for key_tuple, schedule_values in get_schedules():
+    # Loop through schedule items
+    for key_tuple, schedule_values in schedule_items:
         if len(key_tuple) == 3:
             schedule_name, carrier_number, locality_number = key_tuple
             rate_key = f"{term_bundle.rate_sheet_code}#{schedule_name}#{carrier_number}#{locality_number}#locality"
@@ -44,13 +50,13 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
             for proc_code, proc_details in proc_codes.items():
                 code_type = proc_details.get("proc_code_type", "")
                 allow_amt = round(proc_details.get("allowed", 0), 2)
-                percentage = proc_details.get("percentage",0)
+                percentage = proc_details.get("percentage", 0)
 
                 if allow_amt > 0:
                     fee = allow_amt
                     fee_type = "fee schedule"
                 elif percentage > 0:
-                    fee = percentage * 100
+                    fee = round(percentage * 100, 2)
                     fee_type = "percentage"
                 else:
                     fee = 0
@@ -77,8 +83,19 @@ def process_fee_schedule_full(context: Context, term_bundle: TermBundle, rate_ca
                     "full_term_section_id": section_id,
                     "calc_bean": calc_bean
                 }
+
                 code_tuple = (proc_code, modifier, rate_pos)
-                store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
+                store_rate_record(
+                    rate_cache,
+                    dict_key,
+                    rate_dict,
+                    rate_key,
+                    rate_group_key_factory,
+                    code_tuple,
+                    context.shared_config.valid_service_codes,
+                    context.rate_cache_index,
+                    term_bundle=term_bundle
+                )
 
 def process_fee_schedule_ranges(
     context: Context,
@@ -152,66 +169,69 @@ def _process_fee_schedule_range_common(
     section_id = term_bundle.section_id
     calc_bean = term_bundle.calc_bean
     rate_pos, rate_type_desc = get_pos_and_type(section_name="")
-    service_mod_pos_list = list(term_bundle.service_mod_pos_list or [])
-    base_pct_of_charge = term_bundle.base_pct_of_charge
+    base_pct_of_charge = term_bundle.base_pct_of_charge or 1.0
 
-    for proc_code, modifier, pos, _ in service_mod_pos_list:
+    proc_maps = []
+
+    for proc_code, modifier, pos, _ in (term_bundle.service_mod_pos_list or []):
         pos = pos or "11"
-        proc_maps = []
 
         if proc_code:
-            proc_detail = schedule_values.get(modifier, {}).get(proc_code)
-            if proc_detail:
-                proc_maps.append((proc_code, modifier, proc_detail))
-        elif modifier:
-            proc_map = schedule_values.get(modifier, {})
-            for code, detail in proc_map.items():
-                if code:
-                    proc_maps.append((code, modifier, detail))
-        elif pos:
-            for mod_key, proc_map in schedule_values.items():
-                for code, detail in proc_map.items():
-                    if code:
-                        proc_maps.append((code, '', detail))
-
-        for code, mod, detail in proc_maps:
-            code_type = detail.get("proc_code_type", "")
-            allow_amt = round(detail.get("allowed", 0), 2)
-            percentage = detail.get("percentage",0)
-            if allow_amt > 0:
-                fee = allow_amt
-                if base_pct_of_charge > 0:
-                    fee = round(fee * base_pct_of_charge,2)
+            # 🔹 Explicit service code: simple lookup
+            detail = schedule_values.get(modifier, {}).get(proc_code)
+            if detail:
+                proc_maps.append((proc_code, modifier or "", pos, detail))
+        else:
+            # 🔸 No service code: expand all for matching mod/POS combos
+            if modifier:
+                for code, detail in schedule_values.get(modifier, {}).items():
+                    proc_maps.append((code, modifier, pos, detail))
             else:
-                fee = percentage
-            fee_type = "fee schedule" if allow_amt > 0 else "percentage" if percentage > 0 else "fee schedule"
+                for mod_key, proc_map in schedule_values.items():
+                    for code, detail in proc_map.items():
+                        proc_maps.append((code, "", pos, detail))
 
-            dict_key = (term_bundle.rate_sheet_code, code, mod, pos, code_type)
-            rate_dict = {
-                "update_type": "A",
-                "insurer_code": context.insurer_code,
-                "prov_grp_contract_key": rate_key,
-                "negotiation_arrangement": "ffs",
-                "billing_code_type": code_type,
-                "billing_code_type_ver": "10",
-                "billing_code": code,
-                "pos_collection_key": pos,
-                "negotiated_type": fee_type,
-                "rate": str(fee),
-                "modifier": mod,
-                "billing_class": rate_type_desc,
-                "expiration_date": detail.get("termdate", DEFAULT_EXP_DATE),
-                "full_term_section_id": section_id,
-                "calc_bean": calc_bean
-            }
+    for code, mod, pos, detail in proc_maps:
+        code_type = detail.get("proc_code_type", "")
+        allow_amt = round(detail.get("allowed", 0), 2)
+        percentage = detail.get("percentage", 0)
 
-            store_rate_record(
-                rate_cache,
-                dict_key,
-                rate_dict,
-                rate_key,
-                rate_group_key_factory,
-                (code, mod, rate_pos),
-                context.shared_config.valid_service_codes,
-                term_bundle=term_bundle
-            )
+        if allow_amt > 0:
+            fee = round(allow_amt * base_pct_of_charge, 2)
+            fee_type = "fee schedule"
+        elif percentage > 0:
+            fee = percentage
+            fee_type = "percentage"
+        else:
+            continue  # skip invalid
+
+        dict_key = (term_bundle.rate_sheet_code, code, mod, pos, code_type)
+        rate_dict = {
+            "update_type": "A",
+            "insurer_code": context.insurer_code,
+            "prov_grp_contract_key": rate_key,
+            "negotiation_arrangement": "ffs",
+            "billing_code_type": code_type,
+            "billing_code_type_ver": "10",
+            "billing_code": code,
+            "pos_collection_key": pos,
+            "negotiated_type": fee_type,
+            "rate": str(fee),
+            "modifier": mod,
+            "billing_class": rate_type_desc,
+            "expiration_date": detail.get("termdate", DEFAULT_EXP_DATE),
+            "full_term_section_id": section_id,
+            "calc_bean": calc_bean
+        }
+
+        store_rate_record(
+            rate_cache,
+            dict_key,
+            rate_dict,
+            rate_key,
+            rate_group_key_factory,
+            (code, mod, pos),
+            context.shared_config.valid_service_codes,
+            context.rate_cache_index,
+            term_bundle=term_bundle
+        )

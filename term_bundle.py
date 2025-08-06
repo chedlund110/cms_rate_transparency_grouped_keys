@@ -48,6 +48,7 @@ class TermBundle:
         self.locality_fee_schedule_keys: Optional[tuple[str,str,str]] = None
         self.was_poa: bool = False
         self.is_exclusion: bool = is_exclusion
+        self.full_term_display_id = term.get("FULLTERMDISPLAYID","")
 
     def _get_decimal(self, term: Dict[str, Any], key: str) -> Decimal:
         raw = term.get(key, "")

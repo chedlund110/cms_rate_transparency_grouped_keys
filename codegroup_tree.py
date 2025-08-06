@@ -8,18 +8,19 @@ import re
 def extract_provider_ranges_from_tree(tree: dict, context: Context) -> dict:
     provider_ranges = defaultdict(dict)
 
-    def walk(node):
+    def walk(node, inherited_not=False):
         for child in node.get("children", []):
+            child_not = child.get("not_logic_ind", False)
+            total_not = inherited_not or child_not
+
             if "nested_group" in child:
-                walk(child["nested_group"])
+                walk(child["nested_group"], inherited_not=total_not)
             else:
                 code_type = child.get("code_type")
                 code_low = child.get("code_low")
-                is_not = child.get("not_logic_ind", False)
 
-                # ✅ Only keep if it's a provider-level type
                 if code_type in context.provider_code_range_types and code_low:
-                    provider_ranges[code_type][code_low] = {"not_logic_ind": is_not}
+                    provider_ranges[code_type][code_low] = {"not_logic_ind": total_not}
 
     walk(tree)
     return provider_ranges

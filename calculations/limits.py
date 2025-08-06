@@ -53,7 +53,7 @@ def process_limit(context: Context, term_bundle: TermBundle, rate_cache: dict, r
         })
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes, context.rate_cache_index, term_bundle=term_bundle)
 
 def process_limit_allowed(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -108,7 +108,7 @@ def process_limit_allowed(context: Context, term_bundle: TermBundle, rate_cache:
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes, context.rate_cache_index, term_bundle=term_bundle)
 
 def process_limit_allowed_percent(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -163,7 +163,7 @@ def process_limit_allowed_percent(context: Context, term_bundle: TermBundle, rat
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_code,term_bundle=term_bundle)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_code, context.rate_cache_index, term_bundle=term_bundle)
 
 def process_limit_allowed_same_dos(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory) -> None:
     service_mod_pos_list = term_bundle.service_mod_pos_list or []
@@ -218,4 +218,4 @@ def process_limit_allowed_same_dos(context: Context, term_bundle: TermBundle, ra
 
         code_tuple = (proc_code, modifier, pos)
         dict_key = (term_bundle.rate_sheet_code, proc_code, modifier, pos, code_type)
-        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes,term_bundle=term_bundle)
+        store_rate_record(rate_cache, dict_key, rate_dict, rate_key, rate_group_key_factory, code_tuple, context.shared_config.valid_service_codes, context.rate_cache_index, term_bundle=term_bundle)

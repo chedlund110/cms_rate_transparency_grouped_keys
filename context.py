@@ -40,6 +40,7 @@ class Context:
         self.codegroups = {}
         self.fee_schedules = {}
         self.fee_schedule_types = {}
+        self.rate_cache_index = {"by_proc":{}, "by_modifier":{}, "by_pos":{}}
         self.ratesheets = {}
         self.provider_identifier_output_file = provider_identifier_output_file
         self.prov_grp_contract_output_file = prov_grp_contract_output_file
