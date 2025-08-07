@@ -114,6 +114,9 @@ def fetch_providers(context) -> list[dict[str, Any]]:
     #facility_clause = ', '.join(f"'{x}'" for x in facility_indicators)
     # prov.provid = 'PRU21429642' and
     # NxRateSheetId = 'AVCRPRF00221' and 
+    # NxRateSheetId = 'AVCRPRF00417' AND 
+    # NxRateSheetId = 'AVCRPRF00026' AND 
+
     query = f"""
     SELECT
         PROV.provid,
@@ -139,7 +142,6 @@ def fetch_providers(context) -> list[dict[str, Any]]:
     LEFT JOIN contractinfo CTR ON CTR.affiliationid = AFF.affiliationid
     LEFT JOIN ContractNxRateSheet CTRNX ON CTRNX.ContractId = CTR.contractid
     WHERE
-        NxRateSheetId = 'AVCRPRF00417' AND 
         NxRateSheetId IS NOT NULL AND 
         NxRateSheetId LIKE 'AV%' AND 
         NxRateSheetId not like 'Z%' AND  

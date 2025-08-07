@@ -4,11 +4,13 @@ def fetch_ratesheets(context) -> list[dict]:
     # pull rate sheet–driven data
     # RATESHEETCODE = 'AVCRPRF00221' AND 
     # AVCRPRF00336
+    # RATESHEETCODE = 'AVCRPRF00417' AND 
+    # AVCRPRF00026
+    # RATESHEETCODE = 'AVCRPRF00026' AND 
     query: str = f"""
     SELECT * 
     FROM STDRATESHEETS
     WHERE
-        RATESHEETCODE = 'AVCRPRF00417' AND 
         RATESHEETCODE IS NOT NULL AND 
         RATESHEETCODE LIKE 'AV%' AND 
         RATESHEETCODE NOT LIKE 'AVGB%' AND 

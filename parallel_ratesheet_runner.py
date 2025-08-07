@@ -6,15 +6,15 @@ from collections import defaultdict
 from context_factory import build_context
 from shared_config import SharedConfig
 from database_connection import DatabaseConnection
-from file_batch_tracker import FileBatchTracker
 from buffered_rate_file_writer import BufferedRateFileWriter
 from pathlib import Path
 from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id
+from ratesheet_batch_tracker import RateSheetBatchTracker
 from rate_group_key_factory import RateGroupKeyFactory, merge_rate_group_key_factories
 
 def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFactory:
     tracker_path = os.path.join(shared_config.directory_structure["status_tracker_dir"], "ratesheet_status.json")
-    tracker = FileBatchTracker(tracker_path)
+    tracker = RateSheetBatchTracker(tracker_path)
 
     os.makedirs(shared_config.directory_structure["temp_output_dir"], exist_ok=True)
     os.makedirs(os.path.join(shared_config.directory_structure["temp_output_dir"], "negotiated"), exist_ok=True)
@@ -47,7 +47,7 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFact
 
     ctx = multiprocessing.get_context("spawn")
     num_processes = min(8, os.cpu_count() or 1)
-    # num_processes = 2
+    num_processes = 2
     with ctx.Pool(processes=num_processes) as pool:
         rate_group_key_factories = pool.starmap(process_ratesheet_batch_safe, args_list)
 
@@ -61,11 +61,11 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFact
 def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_str, qnxt_conn_str, tracker_path):
     from ratesheet_worker import process_ratesheet_worker
     from database_connection import DatabaseConnection
-    from file_batch_tracker import FileBatchTracker
+    from ratesheet_batch_tracker import RateSheetBatchTracker
     from context_factory import build_context
     from file_writer import open_writer
 
-    tracker = FileBatchTracker(tracker_path)
+    tracker = RateSheetBatchTracker(tracker_path)
     networx_conn = DatabaseConnection(networx_conn_str)
     qnxt_conn = DatabaseConnection(qnxt_conn_str)
 

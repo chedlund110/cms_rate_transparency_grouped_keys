@@ -15,7 +15,7 @@ class BufferedRateFileWriter:
         self._open_new_file()
 
     def _open_new_file(self):
-        os.makedirs(self.target_directory, exist_ok=True)  # ✅ Ensure directory exists
+        os.makedirs(self.target_directory, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{self.file_prefix}_{timestamp}_{self.current_file_index}.TXT"
         self.current_file_path = os.path.join(self.target_directory, filename)

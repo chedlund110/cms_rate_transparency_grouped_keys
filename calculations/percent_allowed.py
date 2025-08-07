@@ -15,7 +15,9 @@ def process_percent_of_allowed(context: Context, term_bundle: TermBundle,
 
     has_service_filters = bool(term_bundle.service_mod_pos_list)
     has_provider_filters = bool(term_bundle.provider_ranges)
-
+    if not has_service_filters and not has_provider_filters:
+        return
+    
     term_bundle.was_poa = True
 
     if has_provider_filters:
