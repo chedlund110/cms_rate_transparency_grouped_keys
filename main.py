@@ -177,10 +177,10 @@ def main():
     
     # standalone rate runner
     mode = "full"
-    rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn, mode)
+    # rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn, mode)
     
     # parallel process runner
-    # rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config, mode)
+    rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config, mode)
 
     run_all_providers(shared_config, rate_group_key_factory)
 

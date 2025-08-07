@@ -142,7 +142,6 @@ def fetch_providers(context) -> list[dict[str, Any]]:
     LEFT JOIN contractinfo CTR ON CTR.affiliationid = AFF.affiliationid
     LEFT JOIN ContractNxRateSheet CTRNX ON CTRNX.ContractId = CTR.contractid
     WHERE
-        NxRateSheetId = 'AVCRPRF00221' and 
         NxRateSheetId IS NOT NULL AND 
         NxRateSheetId LIKE 'AV%' AND 
         NxRateSheetId not like 'Z%' AND  
