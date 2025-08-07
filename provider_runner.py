@@ -3,14 +3,14 @@ from shared_config import SharedConfig
 from collections import defaultdict
 from context_factory import build_context
 from database_connection import DatabaseConnection
-from file_batch_tracker import FileBatchTracker
+from ratesheet_batch_tracker import RateSheetBatchTracker
 from file_writer import open_writer
 from provider_logic import build_provider_bundle_from_rows, process_single_provider, fetch_providers
 from rate_group_key_factory import RateGroupKeyFactory
 
 def run_all_providers(shared_config: SharedConfig, rate_group_key_factory: RateGroupKeyFactory) -> None:
     tracker_path = shared_config.directory_structure["status_tracker_dir"] + "/provider_status.json"
-    tracker = FileBatchTracker(tracker_path)
+    tracker = RateSheetBatchTracker(tracker_path)
 
     networx_conn = DatabaseConnection(shared_config.networx_connection_string)
     qnxt_conn = DatabaseConnection(shared_config.qnxt_connection_string)

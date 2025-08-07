@@ -3,17 +3,16 @@ from typing import Any, Iterator
 from shared_config import SharedConfig
 from context_factory import build_context
 from database_connection import DatabaseConnection
-from batch_tracker import BatchTracker
-from file_batch_tracker import FileBatchTracker
 from buffered_rate_file_writer import BufferedRateFileWriter
+from ratesheet_batch_tracker import RateSheetBatchTracker
 from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id
 from ratesheet_worker import process_ratesheet_worker
 from rate_group_key_factory import RateGroupKeyFactory, merge_rate_group_key_factories
 
-def process_ratesheets(shared_config: SharedConfig, networx_conn, qnxt_conn) -> RateGroupKeyFactory:
+def process_ratesheets(shared_config: SharedConfig, networx_conn, qnxt_conn, mode:str = "full") -> RateGroupKeyFactory:
     # Set up tracking
     tracker_path = os.path.join(shared_config.directory_structure["status_tracker_dir"], "ratesheet_status.json")
-    tracker: BatchTracker = FileBatchTracker(tracker_path)
+    tracker: RateSheetBatchTracker = RateSheetBatchTracker(tracker_path)
 
     # Temporary context just to load rate sheet rows
     temp_context = build_context(shared_config, networx_conn, qnxt_conn)
@@ -23,10 +22,43 @@ def process_ratesheets(shared_config: SharedConfig, networx_conn, qnxt_conn) -> 
 
     ratesheet_rows = fetch_ratesheets(temp_context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)
-
+    
+    # Extract unique rate sheet codes
+    all_codes = {
+        row["RATESHEETCODE"]
+        for rows in grouped_ratesheets.values()
+        for row in rows
+        if row.get("RATESHEETCODE")
+    }
     #LIMIT = 10  # For testing
     #grouped_values = list(grouped_ratesheets.values())[:LIMIT]
-    grouped_values = list(grouped_ratesheets.values())
+    if mode == "full":
+        tracker.initialize_from_list(sorted(all_codes))
+        grouped_values = list(grouped_ratesheets.values())
+
+    elif mode == "resume":
+        pending_codes = set(tracker.get_pending_rate_sheets())
+        grouped_values = [
+            rows for rows in grouped_ratesheets.values()
+            if rows[0]["RATESHEETCODE"] in pending_codes
+        ]
+
+    elif mode == "failed_only":
+        failed_codes = {
+            code for code, info in tracker.data.items()
+            if info["status"] == "failed"
+        }
+        grouped_values = [
+            rows for rows in grouped_ratesheets.values()
+            if rows[0]["RATESHEETCODE"] in failed_codes
+        ]
+
+    else:
+        raise ValueError(f"Unsupported run mode: {mode}")
+
+    # LIMIT = 100  # Optional for testing
+    # grouped_values = list(grouped_ratesheets.values())[:LIMIT]
+
 
     ratesheet_batches = chunk_ratesheet_groups(grouped_values, batch_size=5)
 

@@ -24,7 +24,7 @@ class BufferedRateFileWriter:
         self.buffer = BytesIO()
 
     def write(self, rate_record_dict: dict) -> None:
-        """
+        
         line = FIELD_DELIM.join(
             str(rate_record_dict.get(field, ""))
             for field in rate_template.keys()
@@ -34,7 +34,7 @@ class BufferedRateFileWriter:
             str(rate_record_dict.get(field, ""))
             for field in rate_template.keys()
         ) + "\n"
-
+        """
         encoded_line = line.encode("utf-8")
         line_size = len(encoded_line)
 

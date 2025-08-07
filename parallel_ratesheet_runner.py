@@ -12,9 +12,8 @@ from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id
 from ratesheet_batch_tracker import RateSheetBatchTracker
 from rate_group_key_factory import RateGroupKeyFactory, merge_rate_group_key_factories
 
-def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFactory:
+def parallel_process_ratesheets(shared_config: SharedConfig, mode: str = "full") -> RateGroupKeyFactory:
     tracker_path = os.path.join(shared_config.directory_structure["status_tracker_dir"], "ratesheet_status.json")
-    tracker = RateSheetBatchTracker(tracker_path)
 
     os.makedirs(shared_config.directory_structure["temp_output_dir"], exist_ok=True)
     os.makedirs(os.path.join(shared_config.directory_structure["temp_output_dir"], "negotiated"), exist_ok=True)
@@ -29,9 +28,45 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFact
     ratesheet_rows = fetch_ratesheets(context)
     grouped_ratesheets = group_rows_by_ratesheet_id(ratesheet_rows)
 
+    # Extract unique rate sheet codes
+    all_codes = {
+        row["RATESHEETCODE"]
+        for rows in grouped_ratesheets.values()
+        for row in rows
+        if row.get("RATESHEETCODE")
+    }
+
+    # Initialize tracker and apply mode filtering
+    tracker = RateSheetBatchTracker(tracker_path)
+    
+    if mode == "full":
+        tracker.initialize_from_list(sorted(all_codes))
+        grouped_values = list(grouped_ratesheets.values())
+
+    elif mode == "resume":
+        pending_codes = set(tracker.get_pending_rate_sheets())
+        grouped_values = [
+            rows for rows in grouped_ratesheets.values()
+            if rows[0]["RATESHEETCODE"] in pending_codes
+        ]
+
+    elif mode == "failed_only":
+        failed_codes = {
+            code for code, info in tracker.data.items()
+            if info["status"] == "failed"
+        }
+        grouped_values = [
+            rows for rows in grouped_ratesheets.values()
+            if rows[0]["RATESHEETCODE"] in failed_codes
+        ]
+
+    else:
+        raise ValueError(f"Unsupported run mode: {mode}")
+
     # LIMIT = 100  # Optional for testing
     # grouped_values = list(grouped_ratesheets.values())[:LIMIT]
-    grouped_values = list(grouped_ratesheets.values())
+
+    # Chunk for parallel processing
     batches = chunk_ratesheet_groups(grouped_values, batch_size=15)
 
     args_list = [
@@ -51,10 +86,6 @@ def parallel_process_ratesheets(shared_config: SharedConfig) -> RateGroupKeyFact
     with ctx.Pool(processes=num_processes) as pool:
         rate_group_key_factories = pool.starmap(process_ratesheet_batch_safe, args_list)
 
-    # ✅ All child processes have completed here
-    #flag_path = os.path.join(shared_config.directory_structure["temp_output_dir"], "ratesheets_done.flag")
-    #Path(flag_path).touch()  # This is the flag!
-    # Merge all per-worker dicts into a single dict
     merged_keys = merge_rate_group_key_factories(rate_group_key_factories)
     return merged_keys
 
@@ -65,7 +96,9 @@ def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_st
     from context_factory import build_context
     from file_writer import open_writer
 
+    # Tracker for marking rate sheet status
     tracker = RateSheetBatchTracker(tracker_path)
+    
     networx_conn = DatabaseConnection(networx_conn_str)
     qnxt_conn = DatabaseConnection(qnxt_conn_str)
 

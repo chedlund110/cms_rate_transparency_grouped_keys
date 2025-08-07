@@ -42,15 +42,19 @@ def write_prov_grp_contract_file(context: Context, provider_bundle: ProviderBund
     # Use program_id and rate_key for the xref_key
     xref_block = provider_bundle.prov_grp_contract_keys.get((provider_bundle.program_id, group_key), {})
 
+    programs = xref_block.get("programs", [])
+    rate_keys = xref_block.get("rate_keys", [])
 
-    # xref_details should be a dictionary with "programs" and "rate_keys" as lists
-    programs = xref_block.get("programs", [])  # Default to empty list if not found
-    rate_keys = xref_block.get("rate_keys", [])  # Default to empty list if not found
+    seen = context.__dict__.setdefault("_written_xref_keys", set())
 
-    # Now we can safely loop through programs and rate_keys, since they are both lists
     for program_id in programs:
         for rate_key in rate_keys:
             if rate_key:
+                key = (program_id, rate_key)
+                if key in seen:
+                    continue
+                seen.add(key)
+
                 data_fields = [context.insurer_code, program_id, rate_key]
                 output_rec = FIELD_DELIM.join(data_fields) + '\n'
                 f.write(output_rec)
