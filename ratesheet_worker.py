@@ -47,11 +47,11 @@ def process_ratesheet_worker(
             process_outpatient_services(context, ratesheet.get("outpatient services", []), rate_cache, rate_group_key_factory)
             process_outpatient_exclusions(context, ratesheet.get("outpatient exclusions", []), rate_cache, rate_group_key_factory)
 
-            tracker.mark_complete(rate_sheet_code)
+            # tracker.mark_complete(rate_sheet_code)
             
         except Exception as e:
             # Optional: mark as failed, log, etc.
-            tracker.mark_failed(rate_sheet_code, str(e))
+            # tracker.mark_failed(rate_sheet_code, str(e))
             raise  # re-raise if you want the caller to handle it   
                                 
         finally:

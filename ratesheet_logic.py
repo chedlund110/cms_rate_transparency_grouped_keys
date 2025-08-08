@@ -11,7 +11,6 @@ def fetch_ratesheets(context) -> list[dict]:
     SELECT * 
     FROM STDRATESHEETS
     WHERE
-        RATESHEETCODE = 'AVCRPRF00002' AND 
         RATESHEETCODE IS NOT NULL AND 
         RATESHEETCODE LIKE 'AV%' AND 
         RATESHEETCODE NOT LIKE 'AVGB%' AND 
