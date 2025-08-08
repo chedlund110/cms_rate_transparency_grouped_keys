@@ -57,4 +57,4 @@ def process_term(context: Context, term_bundle: TermBundle, rate_cache: dict, ra
     delta = after_size - before_size
     elapsed = end_time - start_time
     print(f"Term {term_bundle.term_id} added {delta} records (total: {after_size}) in {elapsed:.2f} seconds")
-    
+    print()

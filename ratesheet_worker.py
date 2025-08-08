@@ -42,12 +42,12 @@ def process_ratesheet_worker(
             process_inpatient_services(context, ratesheet.get("inpatient services", []), rate_cache, rate_group_key_factory)
             process_inpatient_exclusions(context, ratesheet.get("inpatient exclusions", []), rate_cache, rate_group_key_factory)
             
-            process_outpatient_services(context, ratesheet.get("outpatient services", []), rate_cache, rate_group_key_factory)
             process_outpatient_case_rate(context, ratesheet.get("outpatient case rate", []), rate_cache, rate_group_key_factory)
             process_outpatient_per_diem(context, ratesheet.get("outpatient per diem", []), rate_cache, rate_group_key_factory)
+            process_outpatient_services(context, ratesheet.get("outpatient services", []), rate_cache, rate_group_key_factory)
             process_outpatient_exclusions(context, ratesheet.get("outpatient exclusions", []), rate_cache, rate_group_key_factory)
 
-            tracker.mark_completed(rate_sheet_code)
+            tracker.mark_complete(rate_sheet_code)
             
         except Exception as e:
             # Optional: mark as failed, log, etc.
@@ -57,6 +57,7 @@ def process_ratesheet_worker(
         finally:
             rate_file_writer.flush_cache(rate_cache)
             rate_cache.clear()
+            context.rate_cache_index = {}
         
     return(rate_group_key_factory)
 

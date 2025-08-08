@@ -63,11 +63,11 @@ def parallel_process_ratesheets(shared_config: SharedConfig, mode: str = "full")
     else:
         raise ValueError(f"Unsupported run mode: {mode}")
 
-    # LIMIT = 100  # Optional for testing
-    # grouped_values = list(grouped_ratesheets.values())[:LIMIT]
+    LIMIT = 100  # Optional for testing
+    grouped_values = list(grouped_ratesheets.values())[:LIMIT]
 
     # Chunk for parallel processing
-    batches = chunk_ratesheet_groups(grouped_values, batch_size=15)
+    batches = chunk_ratesheet_groups(grouped_values, batch_size=1)
 
     args_list = [
         (
@@ -81,8 +81,8 @@ def parallel_process_ratesheets(shared_config: SharedConfig, mode: str = "full")
     ]
 
     ctx = multiprocessing.get_context("spawn")
-    num_processes = min(8, os.cpu_count() or 1)
-    num_processes = 2
+    #num_processes = min(8, os.cpu_count() or 1)
+    num_processes = 3
     with ctx.Pool(processes=num_processes) as pool:
         rate_group_key_factories = pool.starmap(process_ratesheet_batch_safe, args_list)
 
