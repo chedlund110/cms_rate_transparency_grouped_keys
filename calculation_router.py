@@ -52,8 +52,6 @@ from calculations.per_diem import (
 )
 # different calculations may use the same function
 
-# PUT ALLOWED AMOUNT CALCS BACK IN WHEN WE'RE READY
-
 CALCULATION_ROUTER = {
     'CalcASCGrouper9LvNoDisc': calc_asc_grouper_9lv_no_disc,
     'CalcASCGrouperBase': calc_asc_grouper_base,

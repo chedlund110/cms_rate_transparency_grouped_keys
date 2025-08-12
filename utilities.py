@@ -13,8 +13,6 @@ def load_config(config_path) -> list[dict[str,Any]]:
 def format_date_for_filename(filename, file_ext) -> str:
     return filename + datetime.now().strftime("%Y%m%d_%H%M%S") + "." + file_ext
 
-import re
-
 def build_nested_dir(base_dir: str, provider_id: str, rate_sheet_code: str) -> str:
     clean_id = provider_id.strip()
     if not clean_id:
