@@ -1,6 +1,7 @@
 from typing import Any
 from context import Context
 from database_connection import DatabaseConnection
+from datetime import datetime
 from provider_bundle import ProviderBundle
 from utilities import get_service_code_type
 
@@ -85,14 +86,17 @@ def process_fee_schedule_rows(
     context: Context, fee_schedule_name: str, rows: list[dict[str, Any]]
 ) -> dict:
     fee_schedule = {}
+    today = datetime.today()
     for row in rows:
         proc_code = row.get("PROCEDURECODE", "")
         modifier = row.get("MODIFIER", "").strip()
         rate = float(row.get("ALLOWED", 0))
         percentage = float(row.get("PERCENTAGE", 0))
         term_date = row.get("TERMINATIONDATE", None)
-        if term_date:
-            term_date = term_date.strftime('%Y%m%d')
+        if term_date and term_date < today:
+            continue
+
+        term_date = term_date.strftime('%Y%m%d')
 
         proc_code_type = get_service_code_type(proc_code)
 
