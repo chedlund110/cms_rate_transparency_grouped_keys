@@ -117,6 +117,9 @@ def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_st
         file_prefix=f"NEGOTIATED_{batch_uid}"
     )
 
+    metadata_output_dir = os.path.join(batch_output_dir, "metadata")
+    os.makedirs(metadata_output_dir, exist_ok=True)
+
     context = build_context(shared_config, networx_conn, qnxt_conn)
     context.provider_identifier_output_file = provider_identifier_output_file
     context.prov_grp_contract_output_file = prov_grp_contract_output_file
