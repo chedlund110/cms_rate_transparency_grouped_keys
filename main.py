@@ -177,11 +177,12 @@ def main():
     
     # standalone rate runner
     mode = "full"
-    rate_group_key_factory: RateGroupKeyFactory = process_ratesheets(shared_config, networx_conn, qnxt_conn, mode)
+    # rate_group_key_factory, optum_apc_ratesheet_ids = process_ratesheets(shared_config, networx_conn, qnxt_conn, mode)
     
     # parallel process runner
-    #rate_group_key_factory: RateGroupKeyFactory = parallel_process_ratesheets(shared_config, mode)
-
+    rate_group_key_factory, optum_apc_ratesheet_ids = parallel_process_ratesheets(shared_config, mode)
+    
+    shared_config.optum_apc_ratesheet_ids = optum_apc_ratesheet_ids
     run_all_providers(shared_config, rate_group_key_factory)
 
     merge_all_outputs(shared_config)

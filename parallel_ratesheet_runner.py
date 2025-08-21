@@ -12,7 +12,7 @@ from ratesheet_logic import fetch_ratesheets, group_rows_by_ratesheet_id
 from ratesheet_batch_tracker import RateSheetBatchTracker
 from rate_group_key_factory import RateGroupKeyFactory, merge_rate_group_key_factories
 
-def parallel_process_ratesheets(shared_config: SharedConfig, mode: str = "full") -> RateGroupKeyFactory:
+def parallel_process_ratesheets(shared_config: SharedConfig, mode: str = "full") -> tuple[RateGroupKeyFactory,set]:
     tracker_path = os.path.join(shared_config.directory_structure["status_tracker_dir"], "ratesheet_status.json")
 
     os.makedirs(shared_config.directory_structure["temp_output_dir"], exist_ok=True)
@@ -79,15 +79,21 @@ def parallel_process_ratesheets(shared_config: SharedConfig, mode: str = "full")
         )
         for batch in batches
     ]
-
+    optum_apc_ratesheet_ids: set[str] = set()
     ctx = multiprocessing.get_context("spawn")
     num_processes = min(8, os.cpu_count() or 1)
     
     with ctx.Pool(processes=num_processes) as pool:
-        rate_group_key_factories = pool.starmap(process_ratesheet_batch_safe, args_list)
+        results = pool.starmap(process_ratesheet_batch_safe, args_list)
 
+    rate_group_key_factories = []
+    optum_apc_ratesheet_ids = set()
+
+    for factory, temp_ids in results:
+        rate_group_key_factories.append(factory)
+        optum_apc_ratesheet_ids.update(temp_ids)
     merged_keys = merge_rate_group_key_factories(rate_group_key_factories)
-    return merged_keys
+    return merged_keys, optum_apc_ratesheet_ids
 
 def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_str, qnxt_conn_str, tracker_path):
     from ratesheet_worker import process_ratesheet_worker
@@ -126,7 +132,7 @@ def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_st
     context.rate_file_writer = rate_file_writer
 
     try:
-        rate_group_key_factory = process_ratesheet_worker(
+        rate_group_key_factory, optum_apc_ratesheet_ids = process_ratesheet_worker(
             ratesheet_batch,
             context,
             shared_config,
@@ -135,7 +141,7 @@ def process_ratesheet_batch_safe(ratesheet_batch, shared_config, networx_conn_st
             tracker,
             rate_file_writer
         )
-        return rate_group_key_factory
+        return rate_group_key_factory, optum_apc_ratesheet_ids
     
     except Exception as e:
         print(f"❌ Error in batch {batch_uid}: {e}")

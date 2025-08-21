@@ -304,6 +304,6 @@ def process_optum_physician_pricer(context: Context, term_bundle: TermBundle, ra
     # the global rate sheet we need to use is AVGB00000013
     process_fee_schedule(context, term_bundle, rate_cache, rate_group_key_factory)
 
-def process_optum_apc(context: Context, term_bundle: TermBundle):
-    pass
+def process_optum_apc(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
+    context.optum_apc_ratesheet_ids.add(term_bundle.rate_sheet_code)
 

@@ -20,9 +20,10 @@ def process_ratesheet_worker(
     qnxt_conn: Any,
     tracker: Any,
     rate_file_writer: Any
-) -> RateGroupKeyFactory:
+) -> tuple[RateGroupKeyFactory, set[str]]:
     
     rate_group_key_factory: RateGroupKeyFactory = RateGroupKeyFactory()
+    context.optum_apc_ratesheet_ids = set()
 
     for ratesheet_group in batch:
         try:
@@ -59,5 +60,5 @@ def process_ratesheet_worker(
             rate_cache.clear()
             context.rate_cache_index = {}
         
-    return(rate_group_key_factory)
+    return rate_group_key_factory, context.optum_apc_ratesheet_ids
 

@@ -65,7 +65,7 @@ def load_ratesheet_by_code(context: Context, rate_sheet_code: str) -> dict[str, 
     FROM STDRATESHEETS SRS
     LEFT JOIN STDRATESHEETTERMS SRST ON SRS.RATESHEETID = SRST.RATESHEETID
     WHERE SRS.RATESHEETCODE = '{rate_sheet_code}'
-      AND GETDATE() BETWEEN SRST.FROMDATE AND SRST.TODATE
+      AND GETDATE() BETWEEN SRST.FROMDATE AND SRST.TODATE 
     """
     return load_ratesheet(context, query, rate_sheet_code)
 

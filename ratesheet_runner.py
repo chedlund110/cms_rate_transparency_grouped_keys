@@ -67,8 +67,9 @@ def process_ratesheets(shared_config: SharedConfig, networx_conn, qnxt_conn, mod
         file_prefix="NEGOTIATED"
     )
     rate_group_factories = []
+    optum_apc_ratesheet_ids = set()
     for batch in ratesheet_batches:
-        factory = process_ratesheet_worker(
+        factory, temp_optum_ratesheet_ids = process_ratesheet_worker(
             batch=batch,
             context=temp_context,
             shared_config=shared_config,
@@ -78,9 +79,10 @@ def process_ratesheets(shared_config: SharedConfig, networx_conn, qnxt_conn, mod
             rate_file_writer=rate_file_writer
         )
         rate_group_factories.append(factory)
+        optum_apc_ratesheet_ids.update(temp_optum_ratesheet_ids)
     merged_keys = merge_rate_group_key_factories(rate_group_factories)
     rate_file_writer.close_all_files()
-    return merged_keys
+    return merged_keys, optum_apc_ratesheet_ids
 
 def chunk_ratesheet_groups(grouped_ratesheet_values: list[list[dict]], batch_size: int) -> Iterator[list[list[dict]]]:
     for i in range(0, len(grouped_ratesheet_values), batch_size):

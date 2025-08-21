@@ -8,6 +8,23 @@ import time
 def open_writer(file_path: str):
     return open(file_path, "w", encoding="utf-8")
 
+def write_optum_provider_record(
+    context: Context,
+    provider_bundle: ProviderBundle
+) -> None:
+
+    fields = [
+        provider_bundle.rate_sheet_code,
+        provider_bundle.fullname,
+        provider_bundle.npi,
+        provider_bundle.taxonomy
+    ]
+    
+    output_rec = FIELD_DELIM.join(fields) + '\n'
+
+    # Use the open file handle from context
+    context.optum_provider_file.write(output_rec)
+
 def write_provider_identifiers_record(
     context: Context,
     provider_bundle: ProviderBundle,

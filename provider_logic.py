@@ -9,7 +9,11 @@ from provider_bundle import ProviderBundle
 from rate_group_key_factory import RateGroupKeyFactory, RateGroupKey
 from shared_config import SharedConfig
 from context import Context
-from file_writer import write_provider_identifiers_record, write_prov_grp_contract_file
+from file_writer import (
+                        write_provider_identifiers_record, 
+                        write_prov_grp_contract_file,
+                        write_optum_provider_record
+)
 
 def provider_matches_qualifiers(provider_bundle: ProviderBundle, qualifiers: dict, provider_code_field_map: dict) -> bool:
     field_map = provider_code_field_map
@@ -46,6 +50,8 @@ def process_single_provider(
         context: Context,
         shared_config: SharedConfig
     ) -> None:
+    if provider_bundle.rate_sheet_code in shared_config.optum_apc_ratesheet_ids:
+        write_optum_provider_record(context, provider_bundle)
 
     # Attach (carrier, locality) match based on provider ZIP + carrier_number
     attach_provider_locality_info(provider_bundle, context)
@@ -124,6 +130,7 @@ def fetch_providers(context) -> list[dict[str, Any]]:
         PROV.ssn,
         PROV2.fedid 'fedid',
         PROV.provtype,
+        PROV.fullname,
         entity.phyzip AS prov_zip,
         AFF.affiliationid,
         CTR.effdate,

@@ -28,6 +28,9 @@ def run_all_providers(shared_config: SharedConfig, rate_group_key_factory: RateG
     context.provider_identifier_output_file = provider_identifier_output_file
     context.prov_grp_contract_output_file = prov_grp_contract_output_file
 
+    optum_provider_file = open_writer(shared_config.directory_structure["mrf_output_dir"] + "\optum_apc_providers.txt")
+    context.optum_provider_file = optum_provider_file
+
     provider_rows = fetch_providers(context)
 
     grouped_providers = defaultdict(list)

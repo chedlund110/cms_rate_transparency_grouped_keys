@@ -9,6 +9,7 @@ class ProviderBundle:
         self.prov_ssn: str = (provider_data.get("ssn") or "").strip()
         self.npi: str = (provider_data.get("npi") or "").strip()
         self.taxonomy: str = (provider_data.get("taxonomy") or "").strip()
+        self.fullname: str = (provider_data.get("fullname") or "").strip()
 
         # Contract and program context
         self.program_id: str = (provider_data.get("programid") or "").strip()
