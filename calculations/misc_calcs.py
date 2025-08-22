@@ -307,3 +307,6 @@ def process_optum_physician_pricer(context: Context, term_bundle: TermBundle, ra
 def process_optum_apc(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
     context.optum_apc_ratesheet_ids.add(term_bundle.rate_sheet_code)
 
+def process_optum_drg_medicare(context: Context, term_bundle: TermBundle, rate_cache: dict, rate_group_key_factory: RateGroupKeyFactory):
+    context.optum_drg_ratesheet_ids.add(term_bundle.rate_sheet_code)
+

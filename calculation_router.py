@@ -28,6 +28,7 @@ from calculations.misc_calcs import (
     process_visit_plus_rate_per_hour,
     process_optum_physician_pricer,
     process_optum_apc,
+    process_optum_drg_medicare
 )
 from calculations.percent_allowed import (
     process_percent_of_allowed,
@@ -90,5 +91,6 @@ CALCULATION_ROUTER = {
     'CalcUnitLtdByChg': process_unit_ltd_by_chg,
     'CalcPercentPlusExcess': process_percent_plus_excess,
     'CalcVisitPlusRatePerHour': process_visit_plus_rate_per_hour,
-    'CalcHSSAPCGroupPriceNPITaxonomy': process_optum_apc
+    'CalcHSSAPCGroupPriceNPITaxonomy': process_optum_apc,
+    'CalcHSSDRGMedicare': process_optum_drg_medicare
 }
